@@ -1,0 +1,74 @@
+#pragma once
+#include <iostream>
+#include <SFML/Graphics.hpp>
+
+#include "HealthBar.hpp"
+
+class PlayerHealthbar : public HealthBar
+{
+	private:
+		std::vector<Animator> hearts;
+		std::vector<sf::Sprite> sprites;
+		sf::Texture texture;
+	public:
+		PlayerHealthbar (int health = 6)
+		: HealthBar (health, sf::Vector2f (0, 0)) 
+		{
+			
+			texture.loadFromFile ("resources/sprites/Hearts.png");
+			for (int i = 0; i < health / 2; ++i)
+			{
+				sprites.push_back (sf::Sprite (texture));
+				hearts.push_back (Animator (&sprites[i], 3, 3));
+				hearts[i].setSpritePos (sf::Vector2f ((i * 50) + 4, 10));
+			}
+			
+		}
+		virtual void updateHealth () {
+
+			int hR = HealthBar::getHealth();
+			std::cout << "health is " << hR << "\n";
+			//Invariant: Health must not be less than 0 to update frames, so check out here if it is
+			if (hR < 0)
+				return;
+			//Each heart represents 2 HP. so, we can calculate which heart we need to update
+			//with the following equation.
+			//int nextHeart = hearts.size() - ((hR + 1) / 2);
+			//hearts[hR].NextFrame ();
+			for (size_t i = 0; i < hearts.size (); ++i)
+			{
+				if (hR / 2 < i)
+					hearts[i].setFrame (2);
+				if (hR / 2 > i)
+					hearts[i].setFrame (0);
+				if (hR / 2 == i) {
+					if (hR % 2 == 0)
+						hearts[i].setFrame (2);
+					else
+						hearts[i].setFrame (1);
+				}
+				
+			}
+				
+			/*
+			for (size_t i = 0; i < hearts.size (); ++i)
+				if (hR > healh)
+			if (hR > 4)
+				hearts[0].NextFrame ();
+			else if (hR > 2)
+				hearts[1].NextFrame ();
+			else if (hR > 0)
+				hearts[2].NextFrame ();
+			*/
+		}
+		void SetFull () {
+			HealthBar::setHealth (HealthBar::getMaxHealth ());
+			for (size_t i = 0; i < hearts.size (); ++i)
+				hearts[i].setFrame (0);
+		}
+		void draw(sf::RenderWindow& window) {
+			for (size_t i = 0; i < sprites.size(); ++i)
+				window.draw(sprites[i]);
+		}
+
+};
