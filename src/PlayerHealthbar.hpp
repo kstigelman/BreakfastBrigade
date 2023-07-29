@@ -24,6 +24,11 @@ class PlayerHealthbar : public HealthBar
 			}
 			
 		}
+		virtual void setPosition (sf::Vector2f position) {
+			for (size_t i = 0; i < hearts.size(); ++i) {
+				hearts[i].setSpritePos (sf::Vector2f ((i * 50) + position.x, position.y));
+			}
+		}
 		virtual void updateHealth () {
 
 			int hR = HealthBar::getHealth();
@@ -47,7 +52,6 @@ class PlayerHealthbar : public HealthBar
 					else
 						hearts[i].setFrame (1);
 				}
-				
 			}
 				
 			/*
@@ -67,8 +71,9 @@ class PlayerHealthbar : public HealthBar
 				hearts[i].setFrame (0);
 		}
 		void draw(sf::RenderWindow& window) {
+			//window.draw(sprites[0]);
 			for (size_t i = 0; i < sprites.size(); ++i)
-				window.draw(sprites[i]);
+				window.draw (sprites[i]);
 		}
 
 };

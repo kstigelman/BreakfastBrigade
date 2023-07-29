@@ -165,6 +165,10 @@ public:
 	{
 		return sf::Vector2u (frameBox.width, frameBox.height);
 	}
+	int getOffset ()
+	{
+		return frameBox.left;
+	}
 	virtual void update () {
 		//if (texture == nullptr)
 		//	std::cout << "null update" << std::endl;
@@ -172,6 +176,8 @@ public:
 
 	virtual void draw (sf::RenderWindow& window)
 	{
+		if (sprite == nullptr)
+			return;
 		window.draw (*sprite);
 	}
 	sf::IntRect getRect ()

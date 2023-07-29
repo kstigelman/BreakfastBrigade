@@ -17,7 +17,7 @@ class PlayerHUD : public HUD
 			: HUD (sf::Vector2f (100, 100), sf::Vector2f (0, 0)) {
 			//playerHealth = PlayerHealthbar ();
 			playerHealth = hb;
-			playerHealth->setPosition (sf::Vector2f (getHudPosition ().x - 100, getHudPosition ().y));
+			playerHealth->setPosition (sf::Vector2f (getHudPosition ().x - 100, getHudPosition ().y + 200));
 			HUD::setText ("LVL-01");
 		}
 		~PlayerHUD () {

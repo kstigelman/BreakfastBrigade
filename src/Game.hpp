@@ -11,13 +11,15 @@ class Game
 	private:
 		World world;
 		//Window window;
-		unsigned WIDTH = 360; //360
-		unsigned HEIGHT = 480; //480
+		unsigned WIDTH = 720; //360
+		unsigned HEIGHT = 720; //480
 
+		unsigned framerate = 60;
 		bool windowNeedsScaled = false;
 		sf::RenderWindow window;
 
 		float deltaTime;
+
 	public:
 		Game()
 		{
@@ -79,7 +81,10 @@ class Game
 		}
 		void update()
 		{
-			world.update (deltaTime);
+			
+			if (deltaTime >= 1 / framerate) {
+				world.update (deltaTime);
+			}
 			/*
 			enemy->Update(deltaTime, player->GetPosition());
 			//enemy2->Update(deltaTime, player->GetPosition());

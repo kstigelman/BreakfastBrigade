@@ -16,7 +16,7 @@ class Entity
 	protected:
 		sf::Texture texture;
 		sf::Sprite sprite;
-		Animator* animator;
+		//Animator* animator;
 		//HealthBar healthbar;
 		Collider collider;
 		 
@@ -57,7 +57,22 @@ class Entity
 			//sprite.setPosition(100, 100);
 			velocity = sf::Vector2f(0, 0);
 			externalVelocity = sf::Vector2f(0, 0);
-			
+		}
+		Entity (sf::FloatRect hitbox)
+		{
+			//animator = Animator (texture, 1, 2);
+			name = "nullentity";
+			type = Null;
+			active = true;
+			dead = false;
+			movementSpeed = 0.45f;
+			//maxMovementSpeed = 0.7;
+			//texture.loadFromFile("index/assets/sprites/null.png");
+			//sprite.setTexture(texture);
+			//sprite.setPosition(100, 100);
+			velocity = sf::Vector2f(0, 0);
+			externalVelocity = sf::Vector2f(0, 0);
+			collider.setHitbox (hitbox);
 		}
 		Entity (const Entity& e) 
 		{

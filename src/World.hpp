@@ -2,19 +2,20 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+
 #include "Player.hpp"
-#include "Map.hpp"
-#include "Enemy.hpp"
-#include "Broccoli.hpp"
+#include "Room.hpp"
+
 class World {
     private:
-        Map map;
+        //Map map;
         Player player;
-        Broccoli enemy;
+        //Broccoli enemy;
         //std::vector<Enemy> enemies;
+        Room room;
     public:
         World () {
-            enemy.setTarget (&player);
+            //enemy.setTarget (&player);
             //enemy.isActive = false;
             /*for (int i = 0; i < 4; ++i) {
                 enemies.push_back (enemy);
@@ -27,7 +28,7 @@ class World {
         }
         void update (float dt) {
             player.update (dt);
-            enemy.update (dt);
+            //enemy.update (dt);
             /*
             //std::cout << enemy.GetTarget () << std::endl;
             
@@ -44,7 +45,7 @@ class World {
                     player.Damage (enemies[i].getVelocity (), 1);
             }
             */
-            
+            /*
             if (enemy.isActive ())
                 if (player.getBounds().intersects (enemy.getBounds ()))
                     player.damage (enemy.getVelocity (), 1);
@@ -56,11 +57,13 @@ class World {
                     player.bullets.erase (player.bullets.begin () + i);
                 }
                
-            }
+            }*/
         }
         void draw(sf::RenderWindow& window) {
-           map.Draw (window);
+            room.draw (window);
+            player.draw (window);
+           /*map.Draw (window);
            player.draw (window);
-           enemy.draw (window);
+           enemy.draw (window);*/
         }
 };

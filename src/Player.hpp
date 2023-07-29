@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <set>
 
 #include "Shot.hpp"
 #include "Entity.hpp"
@@ -13,11 +14,13 @@ class Player : public Entity
 	protected:
 		int playerID;
 		//Animator animator;
-		PlayerHealthbar healthbar;
+		//PlayerHealthbar healthbar;
 
-		PlayerHUD hud;
+		//PlayerHUD hud;
 
-		const std::string str = "resources/sprites//Hearts.png";
+		const std::string str = "resources/sprites/Hearts.png";
+
+		sf::RectangleShape shape;
 		//GUI gui = GUI(str, 7);
 
 		sf::Clock shotTimer;
@@ -52,9 +55,10 @@ class Player : public Entity
 			//animator = Animator (texture, sprite, 2, 2);
 		}*/
 		Player(int id = 1)
+		: Entity (sf::FloatRect (0, 0, 8, 16))
 		{
 			Entity::setName ("Player");
-			hud = PlayerHUD (&healthbar);
+			//hud = PlayerHUD (&healthbar);
 			playerID = id;
 			
 			sprite.setScale (1.f, 1.f);
@@ -64,8 +68,11 @@ class Player : public Entity
 			sprite.setTextureRect(sf::IntRect(16 * (id - 1), 0, 16, 20));
 			sprite.setTexture(texture);
 			sprite.setPosition(180, 240);
+
+			shape.setSize (sf::Vector2f (24, 32));
+			shape.setFillColor (sf::Color::Blue);
 			
-			animator = new Animator (&sprite, 2, 4);
+			//animator = new Animator (&sprite, 2, 4);
 			
 			
 		}
@@ -85,7 +92,7 @@ class Player : public Entity
 			//hitbox.setPosition(sprite.getPosition());
 			//bottom = sf::Vector2f(hitbox.getPosition().x + 16, hitbox.getPosition().y + 64);
 			//animator.update ();
-
+			/*
 			if(sprite.getPosition().x >= 360 - 8)
 				canMoveRight = false;
 			else
@@ -105,25 +112,46 @@ class Player : public Entity
 				canMoveDown = false;
 			else
 				canMoveDown = true;
-
+			*/
 			movement(dt);
-			setColliderPosition (getPosition ());
+
 
 			shoot(dt);
 		}
 		void draw(sf::RenderWindow& window)
 		{
-			
-			window.draw(sprite);
+			//Entity::draw (window);
+			window.draw (shape);
+			//window.draw(sprite);
 			//gui->Draw(window);
 			//healthbar.draw (window);
-			for(size_t i = 0; i < bullets.size(); i++)
+			/*for(size_t i = 0; i < bullets.size(); i++)
 			{
 				bullets[i].draw(window);
-			}
-			hud.draw (window);
+			}*/
+			//hud.draw (window);
 		}
 		
+		std::vector<int>
+		keysPressed ()
+		{
+			std::set<int> keys;
+
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
+				keys.insert (1);
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::A))
+				keys.insert (2);
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::S))
+				keys.insert (3);
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::D))
+				keys.insert (4);
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::Space))
+				keys.insert (5);
+			if (sf::Keyboard::isKeyPressed (sf::Keyboard::E))
+				keys.insert (6);
+
+			return keys;
+		}
 		int pressingButton()
 		{
 			if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
@@ -151,25 +179,25 @@ class Player : public Entity
 			int keyInput = pressingButton();
 			if(keyInput != 0)
 			{
-				animator->nextFrame();
+				//animator->nextFrame();
 			}
 			switch(keyInput)
 			{
 				case 1:
-					if(canMoveUp == true)
-						sprite.move (sf::Vector2f (0, -100 * dt));
+					if(canMoveUp)
+						move (sf::Vector2f (0, -100 * dt));
 					break;
 				case 2:
-					if(canMoveLeft == true)
-						sprite.move (sf::Vector2f (-100 * dt, 0));
+					if(canMoveLeft)
+						move (sf::Vector2f (-100 * dt, 0));
 					break;
 				case 3:
-					if(canMoveDown == true)
-						sprite.move (sf::Vector2f (0, 100 * dt));
+					if(canMoveDown)
+						move (sf::Vector2f (0, 100 * dt));
 					break;
 				case 4:
-					if(canMoveRight == true)
-						sprite.move (sf::Vector2f (100 * dt, 0));
+					if(canMoveRight)
+						move (sf::Vector2f (100 * dt, 0));
 					break;
 				case 5:
 					damage (sf::Vector2f (100 * dt, 100 * dt), 1);
@@ -180,6 +208,12 @@ class Player : public Entity
 			
 			//sprite.move (velocity.x * dt, velocity.y * dt);
 			
+		}
+		void
+		move (sf::Vector2f vec) {
+			sprite.move (vec);
+			shape.setPosition (sprite.getPosition ());
+			setColliderPosition (sprite.getPosition ());
 		}
 		sf::Vector2f getPosition()
 		{
@@ -232,7 +266,7 @@ class Player : public Entity
 		{
 			if (canTakeDamage ())
 			{
-				healthbar.takeDamage (amount);
+				//healthbar.takeDamage (amount);
 				dmgTimer.restart ();
 			}
 			else {
@@ -280,8 +314,8 @@ class Player : public Entity
 				return *this;
 
 			playerID = rhs.playerID;
-			animator = rhs.animator;
-			healthbar = rhs.healthbar;
+			//animator = rhs.animator;
+			//healthbar = rhs.healthbar;
 
 			//hud = rhs.hud;
 
