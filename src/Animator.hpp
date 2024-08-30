@@ -25,7 +25,7 @@ public:
 		//texture = new sf::Texture ();
 		//sprite = new sf::Sprite ();
 		//texture = nullptr;
-		sprite = nullptr;
+		//sprite = nullptr;
 	}
 	/*Animator (const Animator& a)
 	{
@@ -61,16 +61,16 @@ public:
 		texture = m_Texture;
 		//texture = sprite->getTexture ();
 		sprite = m_Sprite;
+		
 		totalFrames = frames;
 		framerate = fr;
 
 		updateFrame = false;
 
-		
 
 		frameBox.width = m_Texture.getSize().x / totalFrames;
-
 		frameBox.height = m_Texture.getSize().y;
+	
 		sprite->setTextureRect(frameBox);
 
 		frameClock.restart ();
@@ -83,16 +83,18 @@ public:
 		//texture = sprite->getTexture ();
 		sprite = m_Sprite;
 		texture = *sprite->getTexture();
+		
 		totalFrames = frames;
 		framerate = fr;
 
 		updateFrame = false;
 
 		
-
+	
 		frameBox.width = texture.getSize().x / totalFrames;
-
 		frameBox.height = texture.getSize().y;
+
+
 		sprite->setTextureRect(frameBox);
 
 		frameClock.restart ();
@@ -104,7 +106,7 @@ public:
 	}
 	void destruct () 
 	{
-		printf ("Destructing animator!");
+		//sprite = nullptr;
 		//texture = nullptr;
 		//sprite = nullptr;
 		//delete texture;
@@ -125,8 +127,17 @@ public:
 		sprite->setTextureRect (frameBox);
 		return true;
 	}
+	int getCurrentFrame () {
+		return frameBox.left / frameBox.width;
+	}
 	void nextFrame()
 	{
+
+		if (sprite == nullptr)
+			printf ("Sprite");
+		if (sprite == nullptr)
+			return;
+		
 		if (frameClock.getElapsedTime().asMilliseconds() > 1000 / framerate && !updateFrame)
 		{
 			updateFrame = true;
@@ -193,6 +204,7 @@ public:
 	void setSpritePos (sf::Vector2f pos) {
 		sprite->setPosition (pos);
 	}
+	/*
 	Animator& operator=(const Animator& rhs)
 	{
 		if (this == &rhs)
@@ -210,5 +222,5 @@ public:
 		//*sprite = *rhs.sprite;
 
 		return *this;
-	}
+	}*/
 };

@@ -14,10 +14,9 @@ class Player : public Entity
 	protected:
 		int playerID;
 		//Animator animator;
-		//PlayerHealthbar healthbar;
+		PlayerHealthbar healthbar;
 
 		//PlayerHUD hud;
-
 		const std::string str = "resources/sprites/Hearts.png";
 
 		sf::RectangleShape shape;
@@ -54,8 +53,8 @@ class Player : public Entity
 			
 			//animator = Animator (texture, sprite, 2, 2);
 		}*/
-		Player(int id = 1)
-		: Entity (sf::FloatRect (0, 0, 8, 16))
+		Player(World* world, int id = 1)
+		: Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			Entity::setName ("Player");
 			//hud = PlayerHUD (&healthbar);
@@ -64,22 +63,26 @@ class Player : public Entity
 			sprite.setScale (1.f, 1.f);
 			sprite.setOrigin (8, 10);
 			
-			texture.loadFromFile("resources/sprites/Buddy.png");
-			sprite.setTextureRect(sf::IntRect(16 * (id - 1), 0, 16, 20));
-			sprite.setTexture(texture);
-			sprite.setPosition(180, 240);
-
-			shape.setSize (sf::Vector2f (24, 32));
-			shape.setFillColor (sf::Color::Blue);
+			if (texture.loadFromFile("resources/sprites/Buddy.png")) {
+				sprite.setTextureRect(sf::IntRect(16 * (id - 1), 0, 16, 20));
+				sprite.setTexture(texture);
+				sprite.setPosition(180, 240);
+			}
+			else {
+				drawHitbox = true;
+			}
+			//shape.setSize (sf::Vector2f (24, 32));
+			//shape.setFillColor (sf::Color::Blue);
 			
 			//animator = new Animator (&sprite, 2, 4);
 			
 			
 		}
+		/*
 		Player (const Player& p) 
 		{
 			*this = p;
-		}
+		}*/
 		~Player()
 		{
 			
@@ -121,10 +124,12 @@ class Player : public Entity
 		void draw(sf::RenderWindow& window)
 		{
 			//Entity::draw (window);
-			window.draw (shape);
+			window.draw (sprite);
+			if (drawHitbox)
+				collider.draw (window);
 			//window.draw(sprite);
 			//gui->Draw(window);
-			//healthbar.draw (window);
+			healthbar.draw (window);
 			/*for(size_t i = 0; i < bullets.size(); i++)
 			{
 				bullets[i].draw(window);
@@ -132,7 +137,7 @@ class Player : public Entity
 			//hud.draw (window);
 		}
 		
-		std::vector<int>
+		std::set<int>
 		keysPressed ()
 		{
 			std::set<int> keys;
@@ -171,7 +176,8 @@ class Player : public Entity
 
 			if(sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 				return 6;
-
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::B))
+				return 7;
 			return 0;
 		}
 		void movement(float dt)
@@ -202,10 +208,14 @@ class Player : public Entity
 				case 5:
 					damage (sf::Vector2f (100 * dt, 100 * dt), 1);
 					break;
+				case 7:
+					canDraw = true;
+					printf ("Now showing hitbox");
+					break;
 				default:
 					break;
 			}
-			
+			collider.setPosition (sprite.getPosition ());
 			//sprite.move (velocity.x * dt, velocity.y * dt);
 			
 		}
@@ -266,7 +276,7 @@ class Player : public Entity
 		{
 			if (canTakeDamage ())
 			{
-				//healthbar.takeDamage (amount);
+				healthbar.takeDamage (amount);
 				dmgTimer.restart ();
 			}
 			else {
@@ -308,6 +318,7 @@ class Player : public Entity
 		{
 			return shotTimer.getElapsedTime ().asSeconds () >= shotCooldown;
 		}
+		/*
 		Player& operator=(const Player& rhs)
 		{
 			if (this == &rhs)
@@ -333,7 +344,7 @@ class Player : public Entity
 			canMoveRight = rhs.canMoveRight;
 
 			return *this;
-		}
+		}*/
 		
 
 			

@@ -68,6 +68,7 @@ class HealthBar : public GUI
 		{
 			bar.setFillColor (color);
 		}
+
 		/*
 		 * Returns the amount of health the entity has left
 		 */
@@ -78,6 +79,10 @@ class HealthBar : public GUI
 			if (amount >= maxHealth)
 				amount = maxHealth;
 			health = amount;
+		}
+		void setMaxHealth (int newAmount) {
+			maxHealth = newAmount;
+			health = maxHealth;
 		}
 		virtual void update(float dt, sf::Vector2f position)
 		{

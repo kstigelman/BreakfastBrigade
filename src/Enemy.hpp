@@ -5,16 +5,18 @@
 #include <cmath>
 #include "Animator.hpp"
 #include "Entity.hpp"
-
+#include "World.hpp"
 class Enemy : public Entity
 {
 	protected:
 		const float rad = 180 / 3.14;
 		HealthBar healthBar;
-		Animator* animator;
+		Animator animator;
 		Entity* target;
+
+		
 	public:
-		Enemy()
+		Enemy(class World* world, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			//movementSpeed = 20;
 			
@@ -22,11 +24,11 @@ class Enemy : public Entity
 			texture.loadFromFile("resources/sprites/Enemy.png");
 			sprite.setTexture(texture);
 			
-			sprite.setScale(2.f, 2.f);
-			animator = new Animator(&sprite, 2, 2);
+			animator = Animator(&sprite, 2, 2);
+		
 			//healthBar = new HealthBar(5, sf::Vector2f(), sf::Color::Red);
-			sprite.setOrigin(animator->getFrameDim().x / 2, animator->getFrameDim().y/ 2);			
-			
+			sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);			
+			setTarget (world->getPlayer ());
 		}
 	    ~Enemy()
 		{
@@ -45,7 +47,7 @@ class Enemy : public Entity
 		{
 			if(isActive())
 			{
-				animator->nextFrame();
+				animator.nextFrame();
 				window.draw(sprite);
 				healthBar.draw(window);
 			}
@@ -108,6 +110,7 @@ class Enemy : public Entity
 			}
 		}
 		
+		/*
 		Enemy& operator=(const Enemy& rhs) {
 			if (this == &rhs)
 				return *this;
@@ -119,5 +122,5 @@ class Enemy : public Entity
 			animator = rhs.animator;
 
 			return *this;
-		}
+		}*/
 };

@@ -13,9 +13,14 @@ class Entity
 		double BASE_ATTACK_SPEED = 2.f; //Represents how many attack per second.
 		double BASE_SHIELD = 0.f;
 		double BASE_HEALTH = 100.f;
+		
 	protected:
+		class World* m_world;
+
 		sf::Texture texture;
 		sf::Sprite sprite;
+
+		
 		//Animator* animator;
 		//HealthBar healthbar;
 		Collider collider;
@@ -29,6 +34,7 @@ class Entity
 		double shield = BASE_SHIELD;
 		double health = BASE_HEALTH;
 
+		bool drawHitbox = false;
 	public:
 		enum Types { Null, Player };
 		bool dead;
@@ -43,9 +49,10 @@ class Entity
 		bool canDraw;
 		bool active;
 
-		Entity ()
+		Entity (World* world)
 		{
 			//animator = Animator (texture, 1, 2);
+			m_world = world;
 			name = "nullentity";
 			type = Null;
 			active = true;
@@ -58,8 +65,9 @@ class Entity
 			velocity = sf::Vector2f(0, 0);
 			externalVelocity = sf::Vector2f(0, 0);
 		}
-		Entity (sf::FloatRect hitbox)
+		Entity (World* world, sf::RectangleShape hitbox)
 		{
+			m_world = world;
 			//animator = Animator (texture, 1, 2);
 			name = "nullentity";
 			type = Null;
@@ -148,6 +156,7 @@ class Entity
 			os << e.name << ": " << e.printPosition () << "\n";
 			return os;
 		}
+		/*
 		Entity& operator=(const Entity& e) 
 		{
 			if (this == &e)
@@ -176,5 +185,5 @@ class Entity
 			active = e.active;
 			
 			return *this;
-		}
+		}*/
 };

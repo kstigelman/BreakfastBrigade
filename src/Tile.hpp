@@ -74,6 +74,6 @@ class Floor : public Tile {
      : Tile (vLocation) {
         rigid = false;
         type = 2;
-        tile.setFillColor (sf::Color::Black);
+        tile.setFillColor (sf::Color::Green);
     }
 };

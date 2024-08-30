@@ -6,13 +6,15 @@
 class Window
 {
     private:
-        sf::Vector2i size;
-        sf::RenderWindow window;
+        sf::Vector2i m_size;
+        sf::RenderWindow m_window;
+        std::string m_title;
     public:
         Window (std::string title = "New window", int width = 1280, int height = 720) {
-            size = sf::Vector2i (width, height);
-            window.create(title, sf::VideoMode(width, height));
-            window.setFramerateLimit (60);
+            m_title = title;
+            m_size = sf::Vector2i (width, height);
+            m_window.create(title, sf::VideoMode(width, height));
+            m_window.setFramerateLimit (60);
         }
         sf::RenderWindow& getSize () {
             return size;
@@ -27,5 +29,9 @@ class Window
         void rescale () {
             
         }
-
+        void
+        draw (sf::Drawable drawable) {
+            m_window.draw (sprite);
+        }
+        
 }

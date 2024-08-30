@@ -4,39 +4,48 @@
 
 class Collider {
 	private:
-		sf::FloatRect hitbox;
+		sf::RectangleShape hitbox;
+		
 	public:
-		Collider (sf::FloatRect hb = sf::FloatRect (0, 0, 0, 0)) {
+		bool shouldDraw = false;
+		Collider (sf::RectangleShape hb = sf::RectangleShape ()) {
 			hitbox = hb;
+			hitbox.setOutlineThickness (3.f);
+			hitbox.setOutlineColor (sf::Color::White);
+		}
+		Collider (float width, float height) {
+			hitbox = sf::RectangleShape (sf::Vector2f (width, height));
+			hitbox.setOutlineThickness (3.f);
+			hitbox.setOutlineColor (sf::Color::White);
 		}
 		Collider (const Collider& c) {
 			*this = c;
 		}
 		void 
-		setHitbox (sf::FloatRect newHb) {
+		setHitbox (sf::RectangleShape newHb) {
 			hitbox = newHb;
 		}
-		sf::FloatRect 
+		sf::RectangleShape 
 		getHitbox () {
 			return hitbox;
 		}
 		void 
 		setPosition (sf::Vector2f pos) {
-			hitbox.left = pos.x;
-			hitbox.top = pos.y;
+			hitbox.setPosition (pos);
 		}
 		sf::Vector2f 
 		getPosition () {
-			return sf::Vector2f (hitbox.left, hitbox.top);
+			return hitbox.getPosition();
 		}
 		bool 
 		isColliding (Collider& other) {
-			return hitbox.intersects (other.getHitbox ());
+			return hitbox.getGlobalBounds ().contains (other.getHitbox ().getPosition ());
 		}
 		bool 
 		contains (sf::Vector2f location) {
-			return hitbox.contains (location);
+			return hitbox.getGlobalBounds ().contains (location);
 		}
+		/*
 		Collider& 
 		operator= (const Collider& rhs) 
 		{
@@ -46,6 +55,10 @@ class Collider {
 			hitbox = rhs.hitbox;
 
 			return *this;
+		}*/
+		void draw(sf::RenderWindow& window) {
+			if (shouldDraw)
+				window.draw (hitbox);
 		}
 		
 };
