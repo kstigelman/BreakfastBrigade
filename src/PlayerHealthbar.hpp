@@ -11,6 +11,8 @@ class PlayerHealthbar : public HealthBar
 		std::vector<sf::Sprite*> sprites;
 		sf::Texture texture;
 		sf::Sprite s;
+
+		sf::View hud;
 	public:
 		PlayerHealthbar (int health = 6)
 		: HealthBar (health, sf::Vector2f (0, 0)) 
@@ -21,13 +23,19 @@ class PlayerHealthbar : public HealthBar
 			{
 				sprites.push_back (new sf::Sprite (texture));
 				hearts.push_back (Animator (texture, sprites[i], 3, 3));
-				hearts[i].setSpritePos (sf::Vector2f ((i * 50) + 4, 10));
+				hearts[i].setSpritePos (sf::Vector2f (-10000 + (i * 50) + 4, 10 + -10000));
+				
 			}
 			
+			hud.setSize (576, 720);
+			hud.setCenter (-9712, -9640);
+			hud.setViewport (sf::FloatRect (0, 0, 1, 1));
 		}
 		~PlayerHealthbar () {
-			for (size_t i = sprites.size() - 1; i >= 0; --i)
-				delete sprites[i];
+			for (auto pointer : sprites) {
+				delete pointer;
+			}
+			sprites.clear ();
 		}
 		
 		virtual void destruct () {
@@ -88,6 +96,7 @@ class PlayerHealthbar : public HealthBar
 		}
 		void draw(sf::RenderWindow& window) {
 			//window.draw(sprites[0]);
+			window.setView (hud);
 			for (size_t i = 0; i < sprites.size(); ++i)
 				window.draw (*sprites[i]);
 		}

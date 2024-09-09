@@ -5,7 +5,7 @@
  * 
  */
 #include <SFML/Graphics.hpp>
-#include "Entity.hpp"
+
 
 class Animator
 {

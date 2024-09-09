@@ -15,7 +15,7 @@ class Player : public Entity
 		int playerID;
 		//Animator animator;
 		PlayerHealthbar healthbar;
-
+		sf::View camera;
 		//PlayerHUD hud;
 		const std::string str = "resources/sprites/Hearts.png";
 
@@ -71,6 +71,11 @@ class Player : public Entity
 			else {
 				drawHitbox = true;
 			}
+
+			camera.setSize (576, 576);
+			camera.zoom (1.f);
+			camera.setCenter (sprite.getPosition ().x, sprite.getPosition ().y);
+			camera.setViewport (sf::FloatRect (0, 0.2, 1, 0.8));
 			//shape.setSize (sf::Vector2f (24, 32));
 			//shape.setFillColor (sf::Color::Blue);
 			
@@ -120,16 +125,19 @@ class Player : public Entity
 
 
 			shoot(dt);
+			camera.setCenter (sprite.getPosition ());
 		}
 		void draw(sf::RenderWindow& window)
 		{
 			//Entity::draw (window);
+			window.setView (camera);
 			window.draw (sprite);
 			if (drawHitbox)
 				collider.draw (window);
 			//window.draw(sprite);
 			//gui->Draw(window);
 			healthbar.draw (window);
+			window.setView (camera);
 			/*for(size_t i = 0; i < bullets.size(); i++)
 			{
 				bullets[i].draw(window);

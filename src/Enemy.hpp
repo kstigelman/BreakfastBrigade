@@ -5,7 +5,8 @@
 #include <cmath>
 #include "Animator.hpp"
 #include "Entity.hpp"
-#include "World.hpp"
+
+
 class Enemy : public Entity
 {
 	protected:
@@ -28,7 +29,7 @@ class Enemy : public Entity
 		
 			//healthBar = new HealthBar(5, sf::Vector2f(), sf::Color::Red);
 			sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);			
-			setTarget (world->getPlayer ());
+			//setTarget (world->getPlayer ());
 		}
 	    ~Enemy()
 		{

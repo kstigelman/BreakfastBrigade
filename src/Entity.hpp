@@ -4,6 +4,7 @@
 #include "Collider.hpp"
 #include "HealthBar.hpp"
 
+
 class Entity
 {
 	private:
@@ -102,6 +103,9 @@ class Entity
 		}
 		std::string getName () {
 			return name;
+		}
+		World* getWorld () {
+			return m_world;
 		}
 		virtual void update (float dt) {
 			setColliderPosition (sprite.getPosition ());

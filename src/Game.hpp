@@ -2,7 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
+#include "Title.hpp"
 #include "World.hpp"
+
 
 using std::vector;
 
@@ -11,7 +13,7 @@ class Game
 	private:
 		World world;
 		//Window window;
-		unsigned WIDTH = 720; //360
+		unsigned WIDTH = 576; //360
 		unsigned HEIGHT = 720; //480
 
 		unsigned framerate = 60;
@@ -19,7 +21,9 @@ class Game
 		sf::RenderWindow window;
 
 		float deltaTime;
+		int state = 1;
 
+		Title title;
 	public:
 		Game()
 		{
@@ -65,10 +69,19 @@ class Game
 			while(window.isOpen())
 			{
 				eventManager ();
-				update();
-				window.clear();
-				draw();
-				window.display();
+				if (state == 0) {
+					title.update (deltaTime);
+					window.clear();
+					title.draw (window);
+					window.display();
+				}
+				if (state == 1) {
+					update();
+					window.clear();
+					draw();
+					window.display();
+				}
+				
 				
 				sf::Time time = clock.restart();
 				float dt = time.asSeconds();
