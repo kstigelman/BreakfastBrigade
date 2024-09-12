@@ -28,6 +28,8 @@ class Player : public Entity
 		float shotCooldown = 0.3f;
 		float invincibilityCooldown = 1.f;
 		double kbMult = 2000.f;
+
+		std::set<int> inputs;
 	public:
 		std::vector<Shot> bullets;
 		bool canMoveUp = true;
@@ -79,7 +81,7 @@ class Player : public Entity
 			//shape.setSize (sf::Vector2f (24, 32));
 			//shape.setFillColor (sf::Color::Blue);
 			
-			//animator = new Animator (&sprite, 2, 4);
+			animator = Animator (&sprite, 2, 4);
 			
 			
 		}
@@ -165,6 +167,9 @@ class Player : public Entity
 
 			return keys;
 		}
+		std::set<int> &getInputs () {
+			return inputs;
+		}
 		int pressingButton()
 		{
 			if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
@@ -190,10 +195,11 @@ class Player : public Entity
 		}
 		void movement(float dt)
 		{
+			inputs = keysPressed ();
 			int keyInput = pressingButton();
 			if(keyInput != 0)
 			{
-				//animator->nextFrame();
+				animator.nextFrame();
 			}
 			switch(keyInput)
 			{
@@ -318,6 +324,9 @@ class Player : public Entity
 		{
 			return dead;
 		}
+		bool isDead () {
+			return healthbar.dead();
+		}
 		bool canTakeDamage()
 		{
 			return dmgTimer.getElapsedTime ().asSeconds () >= invincibilityCooldown;
@@ -325,6 +334,9 @@ class Player : public Entity
 		bool canShoot()
 		{
 			return shotTimer.getElapsedTime ().asSeconds () >= shotCooldown;
+		}
+		sf::View& getCamera () {
+			return camera;
 		}
 		/*
 		Player& operator=(const Player& rhs)

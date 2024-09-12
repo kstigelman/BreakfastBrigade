@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include "Ship.hpp"
+#include "AnimatedObject.hpp"
 #include <algorithm>
 class Title {
 public:
@@ -22,11 +22,12 @@ public:
     sf::Texture title;
     sf::Sprite titleSprite;
 
-    Ship ship;
+    AnimatedObject ship = AnimatedObject ("resources/sprites/ship.png", 7, 7); 
+    
 
     Phase currentPhase;
-    sf::SoundBuffer soundBuffer;
-    sf::Music theme;
+    //sf::SoundBuffer soundBuffer;
+    //sf::Music theme;
     sf::Clock timer;
 
     int currentAlpha = 0;
@@ -34,6 +35,7 @@ public:
     
     
     Title () {
+        
         splashTexture.loadFromFile ("resources/sprites/Splash.png");
         splashSprite.setTexture (splashTexture);
         splashSprite.setScale (2, 2);
@@ -56,13 +58,17 @@ public:
         currentPhase = SPLASH;
 
 
-        soundBuffer.loadFromFile ("resources/audio/Theme.wav");
+        //soundBuffer.loadFromFile ("resources/audio/Theme.wav");
 
-        theme.openFromFile ("resources/audio/Theme.wav");
+        /*theme.openFromFile ("resources/audio/Theme.wav");
         theme.setLoopPoints (sf::Music::TimeSpan (sf::milliseconds (17600), sf::milliseconds (33270)));
         theme.setLoop (true);
-        theme.play();
+        theme.play();*/
         timer.restart ();
+
+        ship.getSprite().setScale (4, 4);
+        ship.getSprite().setPosition (360, 360);
+        ship.getSprite().setOrigin (15, 6);
     }
     void update (float dt) {
         if (currentPhase == SPLASH) {
@@ -83,7 +89,9 @@ public:
             } 
         }
         else if (currentPhase == TITLE) {
-            ship.update (dt);
+            ship.update (dt, [this](float dt){
+                ship.setPosition (360, 360 + (15 * std::sin (ship.elapsedTime * 3.6 / 3.14)));
+            });
             for (int i = 0; i < 2; ++i) {
                 if (background[i].getPosition ().x < -1000) {
                     background[i].setPosition (0, 0);

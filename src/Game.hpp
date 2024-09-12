@@ -24,10 +24,13 @@ class Game
 		int state = 1;
 
 		Title title;
+
+		sf::Music musicPlayer;
 	public:
 		Game()
 		{
 			window.create(sf::VideoMode(WIDTH, HEIGHT), "The Breakfast Brigade");
+			musicManager ();
 		}
 		~Game()
 		{
@@ -61,6 +64,22 @@ class Game
 		}
 		void stateManager () {
 
+		}
+		void musicManager () {
+			if (state == 0) {
+				musicPlayer.stop();
+				musicPlayer.openFromFile ("resources/audio/Theme.wav");
+				musicPlayer.setLoopPoints (sf::Music::TimeSpan (sf::milliseconds (17600), sf::milliseconds (33270)));
+				musicPlayer.setLoop (true);
+				musicPlayer.play();
+			}
+			if (state == 1) {
+				musicPlayer.stop();
+				musicPlayer.openFromFile ("resources/audio/Microbial_Undertone.wav");
+				musicPlayer.setLoopPoints (sf::Music::TimeSpan (sf::milliseconds (12000), sf::milliseconds (40000)));
+				musicPlayer.setLoop (true);
+				musicPlayer.play();
+			}
 		}
 		void run () {
 			//std::srand(std::time(NULL));

@@ -5,7 +5,7 @@
 class Collider {
 	private:
 		sf::RectangleShape hitbox;
-		
+		bool rigid = false;
 	public:
 		bool shouldDraw = false;
 		Collider (sf::RectangleShape hb = sf::RectangleShape ()) {
@@ -56,6 +56,12 @@ class Collider {
 
 			return *this;
 		}*/
+		bool isRigid () {
+			return rigid;
+		}
+		void setRigid (bool val) {
+			rigid = val;
+		}
 		void draw(sf::RenderWindow& window) {
 			if (shouldDraw)
 				window.draw (hitbox);

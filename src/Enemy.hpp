@@ -12,28 +12,29 @@ class Enemy : public Entity
 	protected:
 		const float rad = 180 / 3.14;
 		HealthBar healthBar;
-		Animator animator;
+		//Animator animator;
 		Entity* target;
 
 		
 	public:
-		Enemy(class World* world, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
+		Enemy(class World* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			//movementSpeed = 20;
 			
 			sprite.setPosition(sf::Vector2f(200, 100));
-			texture.loadFromFile("resources/sprites/Enemy.png");
-			sprite.setTexture(texture);
+			//texture.loadFromFile("resources/sprites/Enemy.png");
+			//sprite.setTexture(texture);
 			
-			animator = Animator(&sprite, 2, 2);
+			//animator = Animator(&sprite, 2, 2);
 		
 			//healthBar = new HealthBar(5, sf::Vector2f(), sf::Color::Red);
-			sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);			
+			//sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);			
 			//setTarget (world->getPlayer ());
+			setTarget (entityTarget);
 		}
 	    ~Enemy()
 		{
-			destruct ();
+
 		}
 		virtual void destruct () {
 			//delete healthBar;
@@ -48,9 +49,9 @@ class Enemy : public Entity
 		{
 			if(isActive())
 			{
-				animator.nextFrame();
+				//animator.nextFrame();
 				window.draw(sprite);
-				healthBar.draw(window);
+				//healthBar.draw(window);
 			}
 		}
 		void setTarget (Entity* targetCollider)
@@ -59,10 +60,17 @@ class Enemy : public Entity
 			//target = targetPosition;
 		}
 		std::string GetTarget () {
+			if (target == nullptr)
+				return getName () + " has no target.";
 			return getName () + " is targetting " + target->getName () + " at position: " + target->printPosition ();
 		}
 		void pathfinding (float dt)
 		{
+			if (target == nullptr) {
+				velocity = sf::Vector2f (0, 0);
+				return;
+			}
+
 			sf::Vector2f targetPos = target->getPosition ();
 
 			float dx = targetPos.x - sprite.getPosition().x;
@@ -102,9 +110,17 @@ class Enemy : public Entity
 			{
 				pathfinding (dt);
 				Entity::update (dt);
+				move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
+				if (velocity != sf::Vector2f (0, 0))
+					animator.nextFrame ();
 				healthBar.update(dt, getPosition());
 				
-				if(healthBar.knockedOut())
+				if (target != nullptr) {
+					if (collider.isColliding (target->getCollider ())) {
+						target->damage (collider.getPosition(), attackDamage);
+					}
+				}
+				if(healthBar.dead())
 				{
 					active = false;
 				}

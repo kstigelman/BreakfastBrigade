@@ -17,6 +17,7 @@ private:
 	sf::Clock frameClock;
 	bool isActive;
 
+	sf::Vector2u frameOffset;
 public:
 	sf::Texture texture;
 	sf::Sprite* sprite;
@@ -74,7 +75,7 @@ public:
 		sprite->setTextureRect(frameBox);
 
 		frameClock.restart ();
-		
+		frameOffset = sf::Vector2u (0, 0);
 	}
 	Animator (sf::Sprite* m_Sprite, int frames, int fr)
 	{

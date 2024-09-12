@@ -11,7 +11,7 @@ class Map
 		sf::RectangleShape background;
 		//Tile* tilemap;
 	public:
-		Map(sf::Vector2f size = sf::Vector2f (360, 480))
+		Map(sf::Vector2f size = sf::Vector2f (1000, 1000))
 		{
 			background.setSize(sf::Vector2f(size.x, size.x));
 			background.setPosition(0, size.y - size.x);

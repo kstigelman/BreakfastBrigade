@@ -24,6 +24,7 @@ class Entity
 		
 		//Animator* animator;
 		//HealthBar healthbar;
+		Animator animator;
 		Collider collider;
 		 
 		std::string name;
@@ -89,7 +90,7 @@ class Entity
 		}
 		~Entity()
 		{
-			destruct ();
+
 		}
 		virtual void init ()
 		{
@@ -97,6 +98,7 @@ class Entity
 		}
 		virtual void destruct ()
 		{
+			
 		}
 		void setName (std::string newName) {
 			name = newName;

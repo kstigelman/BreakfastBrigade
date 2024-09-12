@@ -9,15 +9,22 @@ class Broccoli : public Enemy
 	protected:
 	
 	public:
-		Broccoli(World* world, float difficulty = 0.f) : Enemy (world, difficulty)
+		Broccoli(World* world, Entity* entityTarget, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
 		{
 			//setName ("Broccoli" + std::to_string (id));
 			setPosition(getPosition());
-			movementSpeed = 20.f;
+			movementSpeed = 10.f;
 			
 			//animator = new Animator (&texture, &sprite, 2, 2);
 			healthBar = HealthBar(5 + (difficulty / 5), sf::Vector2f(20 + (difficulty / 50.f), 3 + (difficulty / 50.f)));
+			
+			
+			texture.loadFromFile ("resources/sprites/Broccoli.png");
+			sprite.setTexture (texture);
 			animator = Animator(&sprite, 2, 2);
+			//sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);
+			
+			
 
 			sprite.setScale(2.f + (difficulty / 50.f), 2.f + (difficulty / 50.f));
 			collider.setHitbox (sf::RectangleShape (sf::Vector2f (
@@ -28,8 +35,7 @@ class Broccoli : public Enemy
 		}
 		~Broccoli()
 		{
-		
-		
+			
 		}
 	
 	

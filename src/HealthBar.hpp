@@ -14,6 +14,10 @@ class HealthBar : public GUI
 		bool healthDepleted;
 		sf::RectangleShape bar;
 		sf::RectangleShape outline;
+
+		bool canTakeDamage = true;
+		sf::Clock invincibilityTimer;
+		float invincibilityLength = 1.f;
 	public:
 		HealthBar()
 		{
@@ -59,6 +63,9 @@ class HealthBar : public GUI
 		~HealthBar () 
 		{
 			destruct ();
+		}
+		void setInvincibilityLength (float length) {
+			invincibilityLength = length;
 		}
 		virtual void destruct ()
 		{
@@ -124,25 +131,32 @@ class HealthBar : public GUI
 		}
 		void takeDamage(int strength)
 		{
+			// Healing should be possible even if taking damage is not.
+			if (strength < 0) {
+
+				return;
+			}
+			if (invincibilityTimer.getElapsedTime().asSeconds() < invincibilityLength) {
+				return;
+			}				
 			//health -= strength + opposingStat;
 			health -= strength;
 
-			
 			if (health <= 0)
 			{
 				health = 0;
 				healthDepleted = true;
 			}
-				
 			/*
 				When I removed Draw from Battle, this gives an error
 				Edit: You hecking idiot, you forgot to uncomment the next line and was wondering why it wasnt working
 			*/
 			std::cout << std::to_string (health) << std::endl;
 			updateHealth ();
+			invincibilityTimer.restart();
 			
 		}
-		bool knockedOut() {
+		bool dead() {
 			return healthDepleted;
 		}
 		std::string getOwner() {
