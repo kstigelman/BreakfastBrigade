@@ -21,7 +21,7 @@ class Game
 		sf::RenderWindow window;
 
 		float deltaTime;
-		int state = 1;
+		int state = 0;
 
 		Title title;
 

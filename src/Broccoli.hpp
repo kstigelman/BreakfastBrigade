@@ -22,7 +22,7 @@ class Broccoli : public Enemy
 			texture.loadFromFile ("resources/sprites/Broccoli.png");
 			sprite.setTexture (texture);
 			animator = Animator(&sprite, 2, 2);
-			//sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);
+			sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y / 2);
 			
 			
 

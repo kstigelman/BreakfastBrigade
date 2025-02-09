@@ -57,7 +57,7 @@ class Ship : public Entity {
         virtual void update (float dt) {
             Entity::update (dt);
             //collider.setPosition (m_sprite.getPosition());
-            healthbar.setPosition (sprite.getPosition() + sf::Vector2f (-40, -30));
+            healthbar.setPosition (sprite.getPosition() + sf::Vector2f (0, -30));
 
             if (!destroyed) {
                 animator.nextFrame ();

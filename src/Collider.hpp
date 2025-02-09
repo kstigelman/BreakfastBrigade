@@ -12,11 +12,13 @@ class Collider {
 			hitbox = hb;
 			hitbox.setOutlineThickness (3.f);
 			hitbox.setOutlineColor (sf::Color::White);
+			hitbox.setOrigin (hitbox.getSize().x / 2, hitbox.getSize ().y / 2);
 		}
 		Collider (float width, float height) {
 			hitbox = sf::RectangleShape (sf::Vector2f (width, height));
 			hitbox.setOutlineThickness (3.f);
 			hitbox.setOutlineColor (sf::Color::White);
+			hitbox.setOrigin (hitbox.getSize().x / 2, hitbox.getSize ().y / 2);
 		}
 		Collider (const Collider& c) {
 			*this = c;
@@ -24,6 +26,7 @@ class Collider {
 		void 
 		setHitbox (sf::RectangleShape newHb) {
 			hitbox = newHb;
+			hitbox.setOrigin (hitbox.getSize().x / 2, hitbox.getSize ().y / 2);
 		}
 		sf::RectangleShape 
 		getHitbox () {

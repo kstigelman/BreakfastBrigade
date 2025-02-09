@@ -116,6 +116,7 @@ class Entity
 		virtual void draw(sf::RenderWindow& window)
 		{
 			window.draw(sprite);
+			collider.draw (window);
 		}
 		sf::Vector2f getPosition() const {
 			return sprite.getPosition();

@@ -19,7 +19,8 @@ class World {
         std::vector<Entity*> entities;
         std::vector<TextBox*> textboxes;
         //std::vector<Enemy> enemies;
-
+        bool toggleKeys = false;
+        bool toggle = false;
         bool gameOver = false;
     public:
         World () {
@@ -76,7 +77,23 @@ class World {
                         //textboxes.erase (i);
                     }
                 }
-                
+                if (sf::Keyboard::isKeyPressed (sf::Keyboard::C)) {
+                    if (!toggleKeys) {
+                        toggleKeys = true;
+                        toggle = !toggle;
+                        if (toggle)
+                            printf ("Toggled on\n");
+                        else
+                            printf ("Toggled off\n");
+                        for (Entity* e : entities) {
+                            e->getCollider().shouldDraw = toggle;
+                        }
+                        player->getCollider().shouldDraw = toggle;
+                    }
+                }
+                else {
+                    toggleKeys = false;
+                }
                 for (Entity* e : entities) {
                     if (e == nullptr)
                         continue;

@@ -51,6 +51,7 @@ class Enemy : public Entity
 			{
 				//animator.nextFrame();
 				window.draw(sprite);
+				collider.draw (window);
 				//healthBar.draw(window);
 			}
 		}

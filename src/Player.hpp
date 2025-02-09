@@ -63,7 +63,7 @@ class Player : public Entity
 			playerID = id;
 			
 			sprite.setScale (1.f, 1.f);
-			sprite.setOrigin (8, 10);
+			sprite.setOrigin (0, 0);
 			
 			if (texture.loadFromFile("resources/sprites/Buddy.png")) {
 				sprite.setTextureRect(sf::IntRect(16 * (id - 1), 0, 16, 20));
@@ -71,7 +71,7 @@ class Player : public Entity
 				sprite.setPosition(180, 240);
 			}
 			else {
-				drawHitbox = true;
+				//drawHitbox = true;
 			}
 
 			camera.setSize (576, 576);
@@ -134,8 +134,9 @@ class Player : public Entity
 			//Entity::draw (window);
 			window.setView (camera);
 			window.draw (sprite);
-			if (drawHitbox)
-				collider.draw (window);
+			
+			
+			collider.draw (window);
 			//window.draw(sprite);
 			//gui->Draw(window);
 			healthbar.draw (window);
