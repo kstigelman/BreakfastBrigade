@@ -1,7 +1,6 @@
 #pragma once
-#include <iostream>
 #include <SFML/Graphics.hpp>
-#include <vector>
+#include "Scenes/Scene.hpp"
 
 #include "Player.hpp"
 #include "Broccoli.hpp"
@@ -9,8 +8,9 @@
 #include "Ship.hpp"
 #include "TextBox.hpp"
 
-class World {
-   /* private:
+class ColiforB : public Scene {
+    private:
+
         Map map;
         Player* player;
         Ship ship = Ship (this);
@@ -23,7 +23,9 @@ class World {
         bool toggle = false;
         bool gameOver = false;
     public:
-        World () {
+        ColiforB (Game* game) : Scene (game) {
+            setName ("COLIFOR-B");
+            
             player = new Player (this);
             //enemy = new Broccoli (1, 50.f);
             //enemy2 = new Broccoli ();
@@ -34,18 +36,9 @@ class World {
 
             textboxes.push_back (new TextBox ("COLIFOR-B", sf::Vector2f (0, -110), 5, 24, sf::Color::White, true));
             textboxes.push_back (new TextBox ("The Verdant Forest", sf::Vector2f (0, -90), 5, 14, sf::Color::White, true));
-            //enemy->setTarget (player);
-            //enemy.isActive = false;
-            /*for (int i = 0; i < 4; ++i) {
-                enemies.push_back (enemy);
-            //    enemies[i].isActive = true;
-                enemies[i].SetPosition (sf::Vector2f (50 * i, enemies[i].GetPosition ().y));
-            }*/
-           //ship.setPosition (0, 0);
-           //ship.setDestroyed (true);
-           /*
+            std::cout << "Scene loaded: " << getName() << std::endl;
         }
-        ~World () {
+        ~ColiforB () {
            delete player;
            for (Entity* e : entities)
                 delete e;
@@ -56,8 +49,7 @@ class World {
             textboxes.clear ();
             entities.clear ();
         }
-        void update (float dt) {
-            
+        void update (float dt) override {
             if (!player->isDead ()) {
                 player->update (dt);
 
@@ -125,35 +117,19 @@ class World {
                     
                }
             }
-            //enemy->update (dt);
-           
-            //enemy2->update (dt);
-            //std::cout << enemy.GetTarget () << std::endl;
-            
-            /*
-            for (size_t i = 0; i < enemies.size (); ++i) 
-            {
-                if (!enemies[i].isActive)
-                {
-                    enemies[i] = enemies[enemies.size () - 1];
-                    enemies.pop_back ();
-                    break;
-                }
-                    
-                if (player.GetBounds ().intersects (enemies[i].GetBounds ()))
-                    player.Damage (enemies[i].getVelocity (), 1);
-            }
-            */
-            
-          /* 
         }
-        /*
-        void draw(sf::RenderWindow& window) {
-            //room.draw (window);
+        void spawn (Entity* e) {
+            entities.push_back (e);
+        }
+        Player* getPlayer () {
+            return player;
+        }
+        void draw (sf::RenderWindow& window) override {
+                        //room.draw (window);
             //player.draw (window);
             //window.setView (window.getDefaultView ());
             map.Draw (window);
-
+            
             ship.draw (window);
 
             
@@ -171,13 +147,5 @@ class World {
                     tb->draw (window);
             }
             window.setView (player->getCamera ());
-            
-            //enemy2->draw (window);
         }
-        void spawn (Entity* e) {
-            entities.push_back (e);
-        }
-        Player* getPlayer () {
-            return player;
-        }*/
 };

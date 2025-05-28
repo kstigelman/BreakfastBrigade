@@ -4,6 +4,7 @@
 #include "Collider.hpp"
 #include "HealthBar.hpp"
 
+#include "Scenes/Scene.hpp"
 
 class Entity
 {
@@ -16,7 +17,7 @@ class Entity
 		double BASE_HEALTH = 100.f;
 		
 	protected:
-		class World* m_world;
+		class Scene* m_world;
 
 		sf::Texture texture;
 		sf::Sprite sprite;
@@ -51,10 +52,10 @@ class Entity
 		bool canDraw;
 		bool active;
 
-		Entity (World* world)
+		Entity (Scene* scene)
 		{
 			//animator = Animator (texture, 1, 2);
-			m_world = world;
+			m_world = scene;
 			name = "nullentity";
 			type = Null;
 			active = true;
@@ -67,9 +68,9 @@ class Entity
 			velocity = sf::Vector2f(0, 0);
 			externalVelocity = sf::Vector2f(0, 0);
 		}
-		Entity (World* world, sf::RectangleShape hitbox)
+		Entity (Scene* scene, sf::RectangleShape hitbox)
 		{
-			m_world = world;
+			m_world = scene;
 			//animator = Animator (texture, 1, 2);
 			name = "nullentity";
 			type = Null;
@@ -106,7 +107,7 @@ class Entity
 		std::string getName () {
 			return name;
 		}
-		World* getWorld () {
+		Scene* getScene () {
 			return m_world;
 		}
 		virtual void update (float dt) {

@@ -17,7 +17,7 @@ class Enemy : public Entity
 
 		
 	public:
-		Enemy(class World* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
+		Enemy(class Scene* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			//movementSpeed = 20;
 			

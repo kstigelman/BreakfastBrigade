@@ -10,4 +10,4 @@ class Global {
     public:
     Global(const Global& obj)
     = delete; 
-}
+};

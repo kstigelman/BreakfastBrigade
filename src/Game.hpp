@@ -4,7 +4,13 @@
 
 #include "Title.hpp"
 #include "World.hpp"
+#include "Scenes/Scene.hpp"
+#include "Controls.hpp"
+#include "Scenes/MainMenu.hpp"
+#include "Scenes/ColiforB.hpp"
+#include "UI/UIRegistry.hpp"
 
+#include "Globals.hpp"
 
 using std::vector;
 
@@ -20,21 +26,37 @@ class Game
 		bool windowNeedsScaled = false;
 		sf::RenderWindow window;
 
+		std::set<sf::Keyboard::Key> input;
+		
 		float deltaTime;
-		int state = 0;
+		int state = 1;
 
 		Title title;
 
+		UIRegistry uiRegistry;
+
 		sf::Music musicPlayer;
 	public:
+
 		Game()
 		{
 			window.create(sf::VideoMode(WIDTH, HEIGHT), "The Breakfast Brigade");
 			musicManager ();
+
+			currentScene = new MainMenu (&uiRegistry, this);
 		}
 		~Game()
 		{
-
+			if (currentScene != nullptr) {
+				delete currentScene;
+				currentScene = nullptr;
+			}
+		}
+		void setScene (Scene* newScene) {
+			Scene* oldScene = currentScene;
+			currentScene = newScene;
+			delete oldScene;
+			oldScene = nullptr;
 		}
 		void windowRescaleEvent()
 		{
@@ -52,13 +74,44 @@ class Game
 		}
 		void eventManager () {
 				sf::Event event;
+				bLeftClicked = false;
+				input.clear ();
 				while (window.pollEvent (event))
 				{
+					uiRegistry.eventHandler (event);
+
 					if (event.type == sf::Event::Closed)
 						window.close ();
 
 					if (event.type == sf::Event::Resized)
 						windowRescaleEvent ();
+					
+					if (event.type == sf::Event::MouseMoved) 
+						mousePos = sf::Vector2i (event.mouseButton.x, event.mouseButton.y);
+
+					if (sf::Keyboard::isKeyPressed (sf::Keyboard::P)) {
+						state = 1;
+					}
+
+
+
+					if (sf::Keyboard::isKeyPressed (MOVE_UP))
+						input.insert (MOVE_UP);
+				
+					if (sf::Keyboard::isKeyPressed (MOVE_DOWN))
+						input.insert (MOVE_DOWN);
+					
+					if (sf::Keyboard::isKeyPressed (MOVE_LEFT))
+						input.insert (MOVE_LEFT);
+
+					if (sf::Keyboard::isKeyPressed (MOVE_RIGHT))
+						input.insert (MOVE_RIGHT);
+
+					if (sf::Keyboard::isKeyPressed (SELECT_BUTTON))
+						input.insert (SELECT_BUTTON);
+						
+					if (sf::Mouse::isButtonPressed (sf::Mouse::Left))
+						bLeftClicked = true;
 				}
 				
 		}
@@ -86,20 +139,23 @@ class Game
 			sf::Clock clock;
 
 			while(window.isOpen())
-			{
+			{	
 				eventManager ();
-				if (state == 0) {
+				update();
+				draw();
+
+				/*if (state == 0) {
 					title.update (deltaTime);
 					window.clear();
 					title.draw (window);
 					window.display();
 				}
 				if (state == 1) {
-					update();
+					
 					window.clear();
-					draw();
+					
 					window.display();
-				}
+				}*/
 				
 				
 				sf::Time time = clock.restart();
@@ -109,14 +165,26 @@ class Game
 		}
 		void draw()
 		{
-			world.draw (window);
+			window.clear();
+			if (currentScene == nullptr)
+				return;
+
+			currentScene->draw (window);
+
+			//uiRegistry.draw (window);
+			window.display();
 		}
 		void update()
 		{
 			
+			if (currentScene == nullptr)
+				return;
+
 			if (deltaTime >= 1 / framerate) {
-				world.update (deltaTime);
+				currentScene->update (deltaTime);
 			}
+			uiRegistry.update (deltaTime);
+
 			/*
 			enemy->Update(deltaTime, player->GetPosition());
 			//enemy2->Update(deltaTime, player->GetPosition());

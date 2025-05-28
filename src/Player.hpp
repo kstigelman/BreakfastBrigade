@@ -22,6 +22,8 @@ class Player : public Entity
 		sf::RectangleShape shape;
 		//GUI gui = GUI(str, 7);
 
+		std::set<sf::Keyboard::Key>* controller;
+
 		sf::Clock shotTimer;
 		sf::Clock dmgTimer;
 		
@@ -55,7 +57,7 @@ class Player : public Entity
 			
 			//animator = Animator (texture, sprite, 2, 2);
 		}*/
-		Player(World* world, int id = 1)
+		Player(Scene* world, int id = 1)
 		: Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			Entity::setName ("Player");
@@ -96,6 +98,10 @@ class Player : public Entity
 			//gui = nullptr;
 
 			//delete gui;
+		}
+
+		void setController (std::set<sf::Keyboard::Key> *newController) {
+			controller = newController;
 		}
 		void update(float dt)
 		{
