@@ -26,8 +26,15 @@ set(IMGUI_SFML_IMGUI_DEMO ON)
 
 FetchContent_MakeAvailable(imgui-sfml)
 
-add_executable(Breakfast src/main.cpp 
+add_executable(Breakfast index/src/main.cpp 
 )
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/Engine)
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/Entity)
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/Map)
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/Scenes)
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/Scenes/Screens)
+target_include_directories(Breakfast PRIVATE ${CMAKE_SOURCE_DIR}/index/src/UI)
+
 set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 
 target_link_libraries(Breakfast PRIVATE sfml-graphics)
@@ -40,7 +47,10 @@ if (WIN32 AND BUILD_SHARED_LIBS)
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:Breakfast> $<TARGET_FILE_DIR:Breakfast> COMMAND_EXPAND_LISTS)
 endif()
 
-file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release/resources)
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/index/resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Release/resources)
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/index/resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug/resources)
+
+
 
 install(TARGETS Breakfast)
 
