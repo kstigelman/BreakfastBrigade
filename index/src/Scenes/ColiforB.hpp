@@ -7,9 +7,12 @@
 #include "../Map/Map.hpp"
 #include "../Entity/Ship.hpp"
 #include "../UI/TextBox.hpp"
+#include "../Engine/GameState.hpp" 
+#include "../Engine/GameFunctions.hpp"
 
 class ColiforB : public Scene {
     private:
+        GameState gameState;
 
         Map map;
         Player* player;
@@ -22,6 +25,9 @@ class ColiforB : public Scene {
         bool toggleKeys = false;
         bool toggle = false;
         bool gameOver = false;
+
+        sf::Clock spawnTimer;
+        float spawnInterval = 0.05;
     public:
         ColiforB (GameSettings* gameSettings, std::string character) : Scene (gameSettings) {
             setName ("COLIFOR-B");
@@ -38,11 +44,16 @@ class ColiforB : public Scene {
             textboxes.push_back (new TextBox ("COLIFOR-B", sf::Vector2f (0, -110), 5, 24, sf::Color::White, true));
             textboxes.push_back (new TextBox ("The Verdant Forest", sf::Vector2f (0, -90), 5, 14, sf::Color::White, true));
             std::cout << "Scene loaded: " << getName() << std::endl;
+
         }
         ~ColiforB () {
            delete player;
-           for (Entity* e : entities)
+
+           for (Entity* e : entities) {
+                if (e == nullptr)
+                    continue;
                 delete e;
+           }
 
             for (TextBox* tb : textboxes)
                 if (tb != nullptr)
@@ -54,8 +65,12 @@ class ColiforB : public Scene {
             if (!player->isDead ()) {
                 player->update (dt);
 
-                 ship.update (dt);
+                ship.update (dt);
 
+                if (spawnTimer.getElapsedTime().asSeconds() > spawnInterval) {
+                    spawnEnemies ();
+                    spawnTimer.restart();
+                }
                 
                 for (auto i = textboxes.begin (); i != textboxes.end (); ++i) {
                     if (*i == nullptr)
@@ -87,9 +102,12 @@ class ColiforB : public Scene {
                 else {
                     toggleKeys = false;
                 }
-                for (Entity* e : entities) {
+                for (size_t i = entities.size() - 1; i >= 0; --i) {
+                    Entity* e = entities[i];
+
                     if (e == nullptr)
                         continue;
+                    
                     e->update (dt);
 
                     if (e->isActive ())
@@ -101,6 +119,12 @@ class ColiforB : public Scene {
                         if (e->isActive () && player->bullets[i].isColliding (e)) {
                             e->damage (player->getPosition (), 1);
                             player->bullets.erase (player->bullets.begin () + i);
+
+                            if (e->isDead ()) {
+                                delete e;
+                                e = nullptr;
+                                entities.erase(entities.begin () + i);
+                            }
                         }
 
                     }
@@ -138,9 +162,9 @@ class ColiforB : public Scene {
            
             //enemy->draw (window);
             //enemy->getCollider().shouldDraw = true;
-            player->getCollider().shouldDraw = true;
+            //player->getCollider().shouldDraw = true;
             for (Entity* e : entities) {
-                if (e != nullptr)
+                if (e != nullptr && e->canDraw())
                     e->draw (window);
             }
             for (TextBox* tb : textboxes) {
@@ -152,4 +176,41 @@ class ColiforB : public Scene {
         void eventHandler (sf::Event& e) override {
             getRegistry()->eventHandler (e);
         }
+        bool
+        checkSpawnLocation (int x, int y) {
+            if (!map.getTileMap()->getAtCoordinate (x, y)->collidable)
+                return true;
+            
+            return false;
+
+        }
+        Entity* selectEntity (sf::Vector2f position) {
+            unsigned random = getRandom () % 1000;
+            if (random <= 500) {
+                spawn (new Broccoli (this, player, gameState.getDifficulty ()));
+            }
+            else {
+                spawn (new Broccoli (this, player, gameState.getDifficulty ()));
+            }
+        }
+        void
+        spawnEnemies () {
+            int magnitude = 100;
+            int distance = 500;
+            sf::Vector2i vec = sf::Vector2i (getRandom() % magnitude, getRandom() % magnitude);
+            sf::Vector2i normalized = sf::Vector2i (vec.x / magnitude, vec.y / magnitude);
+            normalized = sf::Vector2i(normalized.x * distance * magnitude, normalized.y * distance * magnitude);
+            
+            if (!checkSpawnLocation (player->getPosition().x + normalized.x, player->getPosition().y + normalized.y)) {
+                normalized = -normalized;
+                if (!checkSpawnLocation (player->getPosition().x + normalized.x, player->getPosition().y + normalized.y)) {
+                    std::cout << "Error: Failed to spawn enemy" << std::endl;
+                    return;
+                }
+            }
+            selectEntity(sf::Vector2f(player->getPosition().x + normalized.x, player->getPosition().y + normalized.y));
+            // Select enemy, add to world at normalized location.
+
+        }
+        
 };

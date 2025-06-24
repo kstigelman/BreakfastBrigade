@@ -15,7 +15,7 @@ private:
 
     std::set<sf::Keyboard::Key>* controller;
     GameSettings* gameSettings;
-
+    bool bTick = false;
 protected:
     bool exitScene = false;
 public:
@@ -44,6 +44,12 @@ public:
     }
 
     virtual void update (float dt) {
+        // We should update a collision handler first
+        // Then update all world objects
+        // Manage entity list as necessary
+
+
+
         /*for (size_t i = 0; i < uiElements.size(); ++i) {
             uiElements[i]->update (dt);
         }*/

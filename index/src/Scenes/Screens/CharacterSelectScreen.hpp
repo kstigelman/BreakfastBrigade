@@ -48,6 +48,7 @@ public:
 
         sf::Texture texture;
         texture.loadFromFile ("resources/sprites/Buddy_Frame.png");
+        
         selectionBox.addSlot ("Bacon Buddy", texture);
         //leftSelectButton.setImage ("resources/sprites/Left_Arrow.png", 4);
         //leftSelectButton.addTag ("CharacterSelect");

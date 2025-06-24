@@ -54,6 +54,13 @@ class TextBox {
 			text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
 
 		}
+		void setText (std::string newMsg) {
+			textString = newMsg;
+			if (textString.getSize () > 0)
+				text.setString (textString);
+			else
+				text.setString ("Placeholder text");
+		}
 		bool isActive () {
 			return active;
 		}

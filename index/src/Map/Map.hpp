@@ -29,6 +29,9 @@ class Map
 		{
 			window.draw (tilemap);
 		}
+		TileMap* getTileMap () {
+			return &tilemap;
+		}
 		void loadWalls () {
 			sf::Vertex* quad = &walls[0];
 

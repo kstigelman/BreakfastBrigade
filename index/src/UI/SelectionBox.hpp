@@ -2,10 +2,15 @@
 #include "Button.hpp"
 #include <tuple>
 
+#include "TextBox.hpp"
+
 class SelectionBox {
 private:
     Button left;
     Button right;
+
+    TextBox textbox;
+
     sf::Texture texture;
     sf::Sprite sprite;
 
@@ -18,7 +23,8 @@ private:
 public:
     SelectionBox (UIRegistry* registry) 
     : left (registry, "Left", sf::Vector2f (0, 0), sf::Vector2f (50, 50)),
-      right (registry, "Right", sf::Vector2f (0, 0), sf::Vector2f (50, 50))
+      right (registry, "Right", sf::Vector2f (0, 0), sf::Vector2f (50, 50)),
+      textbox ("", position + sf::Vector2f (0.0, 50.0), -1, 24, sf::Color::White, false)
     {
 
       left.setImage ("resources/sprites/Arrow.png");
@@ -37,6 +43,8 @@ public:
       
       
       updateSprite ();
+
+
     }
     void setPosition (sf::Vector2f newPosition) {
       position = newPosition;
@@ -56,6 +64,7 @@ public:
       else if (slots.size () == 2) {
         right.setVisibility (true);
       }
+      setSlot (0);
     }
     std::string getSelection () {
       return std::get<0>(slots[currentSelection]);
@@ -101,6 +110,7 @@ public:
         left.setVisibility (false);
 
       updateSprite ();
+      updateText ();
     }
 
     void updateSprite () {
@@ -108,8 +118,16 @@ public:
           return;
       sprite.setTexture (std::get<1>(slots[currentSelection]));
     }
+    void updateText () {
+      if (slots.size() == 0) {
+        textbox.setText ("");
+        return;
+      }
+      textbox.setText (std::get<0>(slots[currentSelection]));
+    }
     void draw (sf::RenderWindow& window) {
       window.draw (sprite);
+      textbox.draw (window);
       //left.draw (window);
       //right.draw (window);
     }

@@ -7,6 +7,8 @@ class TileMap : public sf::Drawable, public sf::Transformable
 {
     public:
         TileMap (int width, int height) {
+            size = width * height;
+            mapSize = sf::Vector2i (width, height);
             tiles = new Tile[width * height];
             Tile tile;
             for (size_t j = 0; j < height; ++j) {
@@ -21,12 +23,26 @@ class TileMap : public sf::Drawable, public sf::Transformable
                     tiles[i + (j * width)] = tile;
                 }
             }
-            load ("resources/sprites/Tiles.png", "N/A", sf::Vector2i (4, 4), width, height, sf::Vector2f (0, 0));
+            load ("resources/sprites/Tiles.png", "N/A", sf::Vector2i (32, 32), width, height, sf::Vector2f (0, 0));
         }
         ~TileMap () {
             delete[] tiles;
             tiles = nullptr;
         }
+        sf::Vector2i getSize () {
+            return mapSize;
+        }
+
+        int getScale () {
+            return scale;
+        }
+        int getTileWidth () {
+
+        }
+        Tile* getAtCoordinate (int x, int y) {
+            sf::Vector2i castCoordinates = sf::Vector2i (x % tileSizePx.x, y % tileSizePx.y);
+            return &tiles[x + (y * mapSize.x)];
+        }   
     private:
         int borderWidth = 4;
         Tile* tiles;
@@ -36,27 +52,25 @@ class TileMap : public sf::Drawable, public sf::Transformable
 		sf::Vector2i tileSizePx;
 		int tileWidth;
 		sf::Vector2f initPos;
-        int scale = 8;
+        int scale = 1;
 
-        int getScale () {
-            return scale;
-        }
-        int getTileWidth () {
+        int size = 0;
 
-        }
+
 		virtual void draw(sf::RenderTarget& renderTarget, sf::RenderStates renderStates) const
         {
 			renderStates.transform *= getTransform();
 			renderStates.texture = &mTexture;
 			renderTarget.draw(mVerticies, renderStates);
         }
+
         bool load(std::string tileset, std::string filepath, sf::Vector2i tileSize, int mapWidth, int mapHeight, sf::Vector2f position)
         {
             initPos = position;
 			mapSize = sf::Vector2i(mapWidth, mapHeight);
 			tileSizePx = tileSize * scale;
 			
-			int tileWidth = 4;
+			int tileWidth = tileSizePx.x;
 
 			if(!mTexture.loadFromFile(tileset)) //Loads TileSet texture
 			{

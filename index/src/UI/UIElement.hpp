@@ -45,6 +45,9 @@ public:
     GameSettings* getSettings () {
         return gameSettings;
     }
+    void updateAnchor () {
+
+    }
     void setAnchor (Anchor newAnchor) {
         switch (newAnchor) {
             case Anchor::TOP_LEFT:

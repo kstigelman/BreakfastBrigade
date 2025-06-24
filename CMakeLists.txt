@@ -20,6 +20,11 @@ FetchContent_Declare(
   GIT_TAG 82dc2033e51b8323857c3ae1cf1f458b3a933c35
 )
 
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+
+
 set(IMGUI_DIR ${imgui_SOURCE_DIR})
 set(IMGUI_SFML_FIND_SFML OFF)
 set(IMGUI_SFML_IMGUI_DEMO ON)
@@ -40,6 +45,7 @@ set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 target_link_libraries(Breakfast PRIVATE sfml-graphics)
 target_link_libraries(Breakfast PRIVATE sfml-audio)
 target_link_libraries(Breakfast PRIVATE ImGui-SFML::ImGui-SFML)
+target_link_libraries(Breakfast PRIVATE nlohmann_json::nlohmann_json)
 
 target_compile_features(Breakfast PRIVATE cxx_std_17)
 if (WIN32 AND BUILD_SHARED_LIBS)

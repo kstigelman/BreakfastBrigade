@@ -232,7 +232,7 @@ class Player : public Entity
 					damage (sf::Vector2f (100 * dt, 100 * dt), 1);
 					break;
 				case 7:
-					canDraw = true;
+					bDraw = true;
 					printf ("Now showing hitbox");
 					break;
 				default:

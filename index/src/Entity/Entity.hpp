@@ -38,9 +38,13 @@ class Entity
 		double health = BASE_HEALTH;
 
 		bool drawHitbox = false;
+	protected:
+		bool bDraw;
+		bool active;
+		bool dead;
 	public:
 		enum Types { Null, Player };
-		bool dead;
+		
 		
 		
 		Types type;
@@ -49,9 +53,8 @@ class Entity
 		sf::Vector2f velocity;
 		sf::Vector2f externalVelocity;
 		
-		bool canDraw;
-		bool active;
 
+		
 		Entity (Scene* scene)
 		{
 			//animator = Animator (texture, 1, 2);
@@ -111,8 +114,11 @@ class Entity
 			return m_world;
 		}
 		virtual void update (float dt) {
-			setColliderPosition (sprite.getPosition ());
+			sf::Vector2f prevPosition = getPosition();
 			move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
+
+			if (collider.isBlocked())
+				setPosition (prevPosition);
 		}
 		virtual void draw(sf::RenderWindow& window)
 		{
@@ -124,6 +130,7 @@ class Entity
 		}
 		void setPosition(sf::Vector2f position) {
 			sprite.setPosition(position);
+			setColliderPosition (sprite.getPosition ());
 		}
 		sf::Vector2f getVelocity () {
 			return velocity;
@@ -133,6 +140,7 @@ class Entity
 		}
 		virtual void move(sf::Vector2f velocity) {
 			sprite.move(velocity);
+			setColliderPosition (sprite.getPosition ());
 		}
 		bool isActive() {
 			return active;
@@ -159,7 +167,15 @@ class Entity
 		//void setMaxMovementSpeed (double newSpeed) { maxMovementSpeed = newSpeed; }
 		//double getHealth () { return healthbar.getHealth (); }
 		//double getMaxHealth () { return healthbar.getMaxHealth (); }
-		
+		bool isDead () {
+			return dead;
+		} 
+		void setDead (bool val) {
+			dead = val;
+		}
+		bool canDraw () {
+			return bDraw;
+		}
 		friend std::ostream& operator<< (std::ostream& os, const Entity& e) {
 			os << e.name << ": " << e.printPosition () << "\n";
 			return os;

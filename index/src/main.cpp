@@ -9,11 +9,16 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+
 
 #include "Engine/Game.hpp"
 
 int main (int argc, char* argv[])
 {
+	std::srand(time(NULL));
+
 	Game game("The Breakfast Brigade");
 	game.run ();
 

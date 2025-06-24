@@ -44,6 +44,11 @@ class Enemy : public Entity
 		virtual void damage(sf::Vector2f source, int amount)
 		{
 			healthBar.takeDamage(1);
+			if (healthBar.dead ()) {
+				dead = true;
+				active = false;
+				bDraw = false;
+			}
 		}
 		virtual void draw (sf::RenderWindow& window)
 		{

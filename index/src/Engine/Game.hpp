@@ -183,7 +183,6 @@ class Game
 		}
 		void update()
 		{
-			
 			if (settings.currentScene == nullptr)
 				return;
 
