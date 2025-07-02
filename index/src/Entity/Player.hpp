@@ -96,9 +96,7 @@ class Player : public Entity
 		}*/
 		~Player()
 		{
-			
 			//gui = nullptr;
-
 			//delete gui;
 		}
 
@@ -304,23 +302,17 @@ class Player : public Entity
 			}
 			else {
 				//if (dmgTimer.getElapsedTime ().asSeconds () <= invincibilityCooldown * 0.5)
-				
 					
 			}
-
 				/*
 				if(health != 1)
 				{
-					
 					//gui->NextFrame();
-					
 				}
 				else
 				{
 					dead = true;
 				}*/
-				
-			
 		}
 		void takeKnockback (sf::Vector2f source) {
 			takeKnockback (source, 1.0f);

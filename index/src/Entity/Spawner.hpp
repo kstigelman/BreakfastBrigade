@@ -3,7 +3,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-#include "Entity.hpp"
+#include "Enemy.hpp"
 
 
 
@@ -12,16 +12,22 @@ using json = nlohmann::json;
 
 class Spawner {
     private:
-        Entity* prototype_;
+        unsigned difficulty = 0;
     public:
-        Spawner (std::string jsonFile) {
-            std::ifstream file(jsonFile);
-            json data = json::parse(file);
-            
-        }
-        Entity* spawn () {
-            return prototype_;
-        }
-        
+        ~Spawner () {
 
+        }
+        virtual Enemy* spawn(sf::Vector2f position) = 0;
+        void setDifficulty (unsigned newDifficulty) {
+            difficulty = newDifficulty;
+        }
+};
+
+template <class T>
+class SpawnerFor : public Spawner {
+    public:
+        virtual Enemy* spawn(sf::Vector2f position) { 
+            entity_ = new T();
+            entity_->setPosition (position);
+        }
 };

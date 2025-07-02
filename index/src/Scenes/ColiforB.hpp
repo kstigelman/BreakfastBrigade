@@ -9,6 +9,7 @@
 #include "../UI/TextBox.hpp"
 #include "../Engine/GameState.hpp" 
 #include "../Engine/GameFunctions.hpp"
+#include "../Entity/Spawner.hpp"
 
 class ColiforB : public Scene {
     private:
@@ -28,6 +29,10 @@ class ColiforB : public Scene {
 
         sf::Clock spawnTimer;
         float spawnInterval = 0.05;
+
+        sf::Clock difficultyTimer;
+
+        std::vector<std::tuple<Spawner*, int>> spawners;
     public:
         ColiforB (GameSettings* gameSettings, std::string character) : Scene (gameSettings) {
             setName ("COLIFOR-B");
@@ -45,6 +50,7 @@ class ColiforB : public Scene {
             textboxes.push_back (new TextBox ("The Verdant Forest", sf::Vector2f (0, -90), 5, 14, sf::Color::White, true));
             std::cout << "Scene loaded: " << getName() << std::endl;
 
+            difficultyTimer.restart();
         }
         ~ColiforB () {
            delete player;
@@ -53,6 +59,16 @@ class ColiforB : public Scene {
                 if (e == nullptr)
                     continue;
                 delete e;
+                e = nullptr;
+           }
+
+           for (std::tuple<Spawner*, int> p : spawners) {
+                Spawner* s = std::get<0>(p);
+
+                if (s == nullptr)
+                    continue;
+                delete s;
+                s = nullptr;
            }
 
             for (TextBox* tb : textboxes)
@@ -70,6 +86,11 @@ class ColiforB : public Scene {
                 if (spawnTimer.getElapsedTime().asSeconds() > spawnInterval) {
                     spawnEnemies ();
                     spawnTimer.restart();
+                }
+
+                if (difficultyTimer.getElapsedTime().asSeconds() > gameState.getNextDifficultyTime ()) {
+                    difficultyTimer.restart ();
+                    updateDifficulty ();
                 }
                 
                 for (auto i = textboxes.begin (); i != textboxes.end (); ++i) {
@@ -149,6 +170,9 @@ class ColiforB : public Scene {
         Player* getPlayer () {
             return player;
         }
+        void addSpawner (Spawner* spawner, unsigned weight) {
+            spawners.push_back(std::pair(spawner, weight));
+        }
         void draw (sf::RenderWindow& window) override {
                         //room.draw (window);
             //player.draw (window);
@@ -176,6 +200,22 @@ class ColiforB : public Scene {
         void eventHandler (sf::Event& e) override {
             getRegistry()->eventHandler (e);
         }
+        void
+        updateDifficulty () {
+            gameState.incrementDifficulty();
+
+            Spawner* newSpawner = getSpawnerForDifficulty (gameState.getDifficulty());
+            if (newSpawner != nullptr)
+                addSpawner (newSpawner, 1);
+        }
+        Spawner* getSpawnerForDifficulty (unsigned diff) {
+            switch (diff) {
+                case 1:
+                    return new SpawnerFor<Broccoli>();
+                default:
+                    return nullptr;
+            }
+        }
         bool
         checkSpawnLocation (int x, int y) {
             if (!map.getTileMap()->getAtCoordinate (x, y)->collidable)
@@ -186,11 +226,19 @@ class ColiforB : public Scene {
         }
         Entity* selectEntity (sf::Vector2f position) {
             unsigned random = getRandom () % 1000;
-            if (random <= 500) {
-                spawn (new Broccoli (this, player, gameState.getDifficulty ()));
-            }
-            else {
-                spawn (new Broccoli (this, player, gameState.getDifficulty ()));
+            unsigned sum = 0;
+
+            for (auto p : spawners) {
+                // Each spawner has a weight
+                int weight = std::get<1>(p);
+                // All weights should add up to 100. So we can select a random number based on this
+                sum += weight;
+
+                if (random <= sum) {
+                    Spawner* s = std::get<0>(p);
+                    s->spawn (position);
+                    break;
+                }       
             }
         }
         void
@@ -198,8 +246,14 @@ class ColiforB : public Scene {
             int magnitude = 100;
             int distance = 500;
             sf::Vector2i vec = sf::Vector2i (getRandom() % magnitude, getRandom() % magnitude);
-            sf::Vector2i normalized = sf::Vector2i (vec.x / magnitude, vec.y / magnitude);
-            normalized = sf::Vector2i(normalized.x * distance * magnitude, normalized.y * distance * magnitude);
+            sf::Vector2f normalized = sf::Vector2f (vec.x / magnitude, vec.y / magnitude);
+
+            float scale = distance / vec.y;
+
+            if (vec.x > vec.y)
+                scale = distance / vec.x;
+            
+            normalized = sf::Vector2f(scale * normalized.x * magnitude, scale * normalized.y * magnitude);
             
             if (!checkSpawnLocation (player->getPosition().x + normalized.x, player->getPosition().y + normalized.y)) {
                 normalized = -normalized;
@@ -210,7 +264,5 @@ class ColiforB : public Scene {
             }
             selectEntity(sf::Vector2f(player->getPosition().x + normalized.x, player->getPosition().y + normalized.y));
             // Select enemy, add to world at normalized location.
-
-        }
-        
+        }   
 };

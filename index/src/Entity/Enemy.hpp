@@ -19,9 +19,10 @@ class Enemy : public Entity
 	public:
 		Enemy(class Scene* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
-			//movementSpeed = 20;
-			
+
 			sprite.setPosition(sf::Vector2f(200, 100));
+			setTarget (entityTarget);
+			//movementSpeed = 20;
 			//texture.loadFromFile("resources/sprites/Enemy.png");
 			//sprite.setTexture(texture);
 			
@@ -30,7 +31,7 @@ class Enemy : public Entity
 			//healthBar = new HealthBar(5, sf::Vector2f(), sf::Color::Red);
 			//sprite.setOrigin(animator.getFrameDim().x / 2, animator.getFrameDim().y/ 2);			
 			//setTarget (world->getPlayer ());
-			setTarget (entityTarget);
+			
 		}
 	    ~Enemy()
 		{
