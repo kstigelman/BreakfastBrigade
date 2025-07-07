@@ -5,8 +5,9 @@
 #include "../UI/HealthBar.hpp"
 
 #include "../Scenes/Scene.hpp"
+#include "../Engine/GameObject.hpp"
 
-class Entity
+class Entity : public GameObject
 {
 	private:
 		double BASE_CRIT_CHANCE = 0.05;
@@ -15,9 +16,8 @@ class Entity
 		double BASE_ATTACK_SPEED = 2.f; //Represents how many attack per second.
 		double BASE_SHIELD = 0.f;
 		double BASE_HEALTH = 100.f;
-		
 	protected:
-		class Scene* m_world;
+		class Level* m_world;
 
 		sf::Texture texture;
 		sf::Sprite sprite;
@@ -29,6 +29,7 @@ class Entity
 		Collider collider;
 		 
 		std::string name;
+		std::string tag;
 
 		double critChance = BASE_CRIT_CHANCE;
 		double movementSpeed = BASE_MOVEMENT_SPEED;
@@ -39,8 +40,7 @@ class Entity
 
 		bool drawHitbox = false;
 	protected:
-		bool bDraw;
-		bool active;
+
 		bool dead;
 	public:
 		enum Types { Null, Player };
@@ -55,8 +55,9 @@ class Entity
 		
 
 		
-		Entity (Scene* scene)
+		Entity (Level* scene)
 		{
+
 			//animator = Animator (texture, 1, 2);
 			m_world = scene;
 			name = "nullentity";
@@ -71,7 +72,7 @@ class Entity
 			velocity = sf::Vector2f(0, 0);
 			externalVelocity = sf::Vector2f(0, 0);
 		}
-		Entity (Scene* scene, sf::RectangleShape hitbox)
+		Entity (Level* scene, sf::RectangleShape hitbox)
 		{
 			m_world = scene;
 			//animator = Animator (texture, 1, 2);
@@ -96,6 +97,9 @@ class Entity
 		{
 
 		}
+		virtual void spawn (Scene* scene) {
+			level->registerObject (this);
+		}
 		virtual void init ()
 		{
 
@@ -110,7 +114,7 @@ class Entity
 		std::string getName () {
 			return name;
 		}
-		Scene* getScene () {
+		Level* getScene () {
 			return m_world;
 		}
 		virtual void update (float dt) {
@@ -129,6 +133,7 @@ class Entity
 			return sprite.getPosition();
 		}
 		void setPosition(sf::Vector2f position) {
+			transform.position = position;
 			sprite.setPosition(position);
 			setColliderPosition (sprite.getPosition ());
 		}
@@ -139,12 +144,11 @@ class Entity
 			return sprite.getGlobalBounds();
 		}
 		virtual void move(sf::Vector2f velocity) {
+			transform.position += velocity;
 			sprite.move(velocity);
 			setColliderPosition (sprite.getPosition ());
 		}
-		bool isActive() {
-			return active;
-		}
+
 		Collider& getCollider () {
 			return collider;
 		}
@@ -173,9 +177,7 @@ class Entity
 		void setDead (bool val) {
 			dead = val;
 		}
-		bool canDraw () {
-			return bDraw;
-		}
+
 		friend std::ostream& operator<< (std::ostream& os, const Entity& e) {
 			os << e.name << ": " << e.printPosition () << "\n";
 			return os;

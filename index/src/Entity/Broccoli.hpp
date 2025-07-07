@@ -9,7 +9,7 @@ class Broccoli : public Enemy
 	protected:
 	
 	public:
-		Broccoli(Scene* world, Entity* entityTarget, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
+		Broccoli(Level* world, Entity* entityTarget, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
 		{
 			//setName ("Broccoli" + std::to_string (id));
 			setPosition(getPosition());

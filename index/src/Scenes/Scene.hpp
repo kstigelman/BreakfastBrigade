@@ -5,10 +5,13 @@
 #include "../UI/UIElement.hpp"
 #include "../UI/UIRegistry.hpp"
 #include "../Engine/GameSettings.hpp"
+#include "../Engine/GameObject.hpp"
 
 class Scene {
 private:
     //std::vector<UIElement*> uiElements;
+    std::vector<GameObject*> objectCollection;
+
     UIRegistry uiRegistry;
     std::string sceneName = "NULL";
     std::string exitInfo = "NULL";
@@ -22,7 +25,21 @@ public:
     Scene (GameSettings* gameSettings) : gameSettings(gameSettings), uiRegistry (gameSettings) {
         
     }
+    ~Scene () {
+        for (GameObject* o : objectCollection) {
+            if (o == nullptr) continue;
 
+            delete o;
+            o = nullptr;
+        }
+        objectCollection.clear ();
+    }
+
+    virtual void registerObject (GameObject* object) {
+        objectCollection.push_back (object);
+    }
+    virtual void registerProjectile (class Projectile* p) = 0;
+    
     ~Scene () {
         
         /*for (size_t i = 0; i < uiElements.size(); ++i) {
@@ -39,8 +56,11 @@ public:
     bool readyForExit () {
         return exitScene;
     }
-    void setController (std::set<sf::Keyboard::Key>* newController) {
+    virtual void setController (std::set<sf::Keyboard::Key>* newController) {
         controller = newController;
+    }
+    std::set<sf::Keyboard::Key>* getController () {
+        return controller;
     }
 
     virtual void update (float dt) {

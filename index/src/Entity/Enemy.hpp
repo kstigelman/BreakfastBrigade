@@ -5,19 +5,22 @@
 #include <cmath>
 #include "../UI/Animator.hpp"
 #include "Entity.hpp"
-
+#include "PathfinderComponent.hpp"
 
 class Enemy : public Entity
 {
+	private:
+		PathfinderComponent pathfinderComponent;
 	protected:
 		const float rad = 180 / 3.14;
 		HealthBar healthBar;
 		//Animator animator;
 		Entity* target;
+		
 
 		
 	public:
-		Enemy(class Scene* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
+		Enemy(class Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 
 			sprite.setPosition(sf::Vector2f(200, 100));
@@ -86,6 +89,9 @@ class Enemy : public Entity
 			float a = std::atan2(dy, dx);
 			
 			velocity = sf::Vector2f( std::cos(a) * getMovementSpeed(), std::sin(a) * getMovementSpeed());
+			//get next position from pathfinder
+			// calculate normal vec to move
+			
 			/*
 			if(dx > 0 && dy > 0)
 			{

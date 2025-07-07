@@ -8,6 +8,8 @@
 #include "Entity.hpp"
 #include "../UI/PlayerHealthbar.hpp"
 #include "../UI/PlayerHUD.hpp"
+#include "Gun.hpp"
+#include "../Engine/Controls.hpp"
 
 class Player : public Entity
 {
@@ -16,6 +18,8 @@ class Player : public Entity
 		//Animator animator;
 		PlayerHealthbar healthbar;
 		sf::View camera;
+
+		Gun gun;
 		//PlayerHUD hud;
 		const std::string str = "resources/sprites/Hearts.png";
 
@@ -31,15 +35,23 @@ class Player : public Entity
 		float invincibilityCooldown = 1.f;
 		double kbMult = 2000.f;
 
-		std::set<int> inputs;
+		td::vector<sf::Keyboard::Key>* controller;
 	public:
 		std::vector<Shot> bullets;
 		bool canMoveUp = true;
 		bool canMoveDown = true;
 		bool canMoveLeft = true;
 		bool canMoveRight = true;
+
+		bool moving = false;
 		
 		
+		void setController (std::set<sf::Keyboard::Key>* newController) {
+			controller = newController;
+		}
+		std::set<sf::Keyboard::Key>* getController () {
+			return controller;
+		}
 		
 		//sf::Vector2f bottom = sf::Vector2f(hitbox.getPosition().x + 16, hitbox.getPosition().y + 64);
 		//sf::RectangleShape hitbox = sf::RectangleShape(sf::Vector2f(32, 64));
@@ -57,7 +69,7 @@ class Player : public Entity
 			
 			//animator = Animator (texture, sprite, 2, 2);
 		}*/
-		Player(std::string character, Scene* world, int id = 1)
+		Player(Level* world, std::string character, int id = 1)
 		: Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
 		{
 			Entity::setName ("Player");
@@ -129,10 +141,11 @@ class Player : public Entity
 			else
 				canMoveDown = true;
 			*/
-			movement(dt);
+			processInput ();
+			//movement(controller, dt);
 
 
-			shoot(dt);
+			//shoot(dt);
 			camera.setCenter (sprite.getPosition ());
 		}
 		void draw(sf::RenderWindow& window)
@@ -200,31 +213,80 @@ class Player : public Entity
 				return 7;
 			return 0;
 		}
+		void processInput () {
+			if (controller == nullptr) 
+				return;
+
+			if (controller->count (MOVE_UP)) {
+				move (sf::Vector2f (0, -100 * dt));
+				moving = true;
+			}
+			else if (controller->count (MOVE_LEFT)) {
+				move (sf::Vector2f (-100 * dt, 0));
+				moving = true;
+			}
+			else if (controller->count (MOVE_DOWN)) {
+				move (sf::Vector2f (0, 100 * dt));
+				moving = true;
+			}
+			else if (controller->count (MOVE_RIGHT)) {
+				move (sf::Vector2f (100 * dt, 0));
+				moving = true;
+			}
+			else {
+				moving = false;
+			}
+
+			if (controller->count (SHOOT_UP)) {
+				shoot (sf::Vector2f (0, -100));
+			}
+			else if (controller->count (SHOOT_LEFT)) {
+				shoot (sf::Vector2f (-100 * dt, 0));
+			}
+			else if (controller->count (SHOOT_DOWN)) {
+				shoot (sf::Vector2f (0, 100));
+			}
+			else if (controller->count (SHOOT_RIGHT)) {
+				shoot (sf::Vector2f (100 * dt));
+			}
+
+
+			if (moving)
+				animator.nextFrame();
+		}
 		void movement(float dt)
 		{
 			inputs = keysPressed ();
+
+			if (controller == nullptr) 
+				return;
+
 			int keyInput = pressingButton();
+
 			if(keyInput != 0)
 			{
-				animator.nextFrame();
+				
 			}
+			
+			
+
 			switch(keyInput)
 			{
 				case 1:
 					if(canMoveUp)
-						move (sf::Vector2f (0, -100 * dt));
+						
 					break;
 				case 2:
 					if(canMoveLeft)
-						move (sf::Vector2f (-100 * dt, 0));
+						
 					break;
 				case 3:
 					if(canMoveDown)
-						move (sf::Vector2f (0, 100 * dt));
+						
 					break;
 				case 4:
 					if(canMoveRight)
-						move (sf::Vector2f (100 * dt, 0));
+						
 					break;
 				case 5:
 					damage (sf::Vector2f (100 * dt, 100 * dt), 1);
@@ -270,8 +332,10 @@ class Player : public Entity
 			
 			return 0;
 		}
-		void shoot(float dt)
+		void shoot(sf::Vector2f direction)
 		{
+			gun.shoot ();
+			/*
 			int direction = shootDirection();
 			if(direction != 0)
 			{
@@ -290,7 +354,7 @@ class Player : public Entity
 				{
 					bullets.erase(bullets.begin() + i);
 				}
-			}
+			}*/
 			
 		}
 		void damage(sf::Vector2f source, int amount)

@@ -54,6 +54,8 @@ class Game
 		void setScene (Scene* newScene) {
 			Scene* oldScene = settings.currentScene;
 			settings.currentScene = newScene;
+			
+			currentScene->setController (&input);
 
 			if (oldScene == nullptr)
 				return;

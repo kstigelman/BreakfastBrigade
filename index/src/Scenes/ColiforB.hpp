@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Scene.hpp"
+#include "Level.hpp"
 
 #include "../Entity/Player.hpp"
 #include "../Entity/Broccoli.hpp"
@@ -11,7 +11,7 @@
 #include "../Engine/GameFunctions.hpp"
 #include "../Entity/Spawner.hpp"
 
-class ColiforB : public Scene {
+class ColiforB : public Level {
     private:
         GameState gameState;
 
@@ -20,8 +20,9 @@ class ColiforB : public Scene {
         Ship ship = Ship (this);
         //Broccoli* enemy;
         //Broccoli* enemy2;
-        std::vector<Entity*> entities;
-        std::vector<TextBox*> textboxes;
+        //std::vector<Entity*> entities;
+        //std::vector<Projectile*> projectiles;
+        //std::vector<TextBox*> textboxes;
         //std::vector<Enemy> enemies;
         bool toggleKeys = false;
         bool toggle = false;
@@ -32,13 +33,16 @@ class ColiforB : public Scene {
 
         sf::Clock difficultyTimer;
 
+        sf::Clock garbageCollectorTimer;
+
+        SpawnerFor<Projectile*> projectiles;
         std::vector<std::tuple<Spawner*, int>> spawners;
     public:
         ColiforB (GameSettings* gameSettings, std::string character) : Scene (gameSettings) {
             setName ("COLIFOR-B");
             
 
-            player = new Player (character, this);
+            player = new Player (this, character);
             //enemy = new Broccoli (1, 50.f);
             //enemy2 = new Broccoli ();
 
@@ -53,23 +57,30 @@ class ColiforB : public Scene {
             difficultyTimer.restart();
         }
         ~ColiforB () {
-           delete player;
+           //delete player;
 
-           for (Entity* e : entities) {
+            /*for (Projectile* p : projectiles) {
+                if (p == nullptr)
+                    continue;
+                delete p;
+                p = nullptr;
+            }
+
+            for (Entity* e : entities) {
                 if (e == nullptr)
                     continue;
                 delete e;
                 e = nullptr;
-           }
+            }
 
-           for (std::tuple<Spawner*, int> p : spawners) {
+            for (std::tuple<Spawner*, int> p : spawners) {
                 Spawner* s = std::get<0>(p);
 
                 if (s == nullptr)
                     continue;
                 delete s;
                 s = nullptr;
-           }
+            }*/
 
             for (TextBox* tb : textboxes)
                 if (tb != nullptr)
@@ -79,33 +90,15 @@ class ColiforB : public Scene {
         }
         void update (float dt) override {
             if (!player->isDead ()) {
-                player->update (dt);
+                player->update (getController (), dt);
 
                 ship.update (dt);
 
-                if (spawnTimer.getElapsedTime().asSeconds() > spawnInterval) {
-                    spawnEnemies ();
-                    spawnTimer.restart();
-                }
+                updateSpawners ();
+                updateDifficulty ();
 
-                if (difficultyTimer.getElapsedTime().asSeconds() > gameState.getNextDifficultyTime ()) {
-                    difficultyTimer.restart ();
-                    updateDifficulty ();
-                }
+                garbageCollector ();
                 
-                for (auto i = textboxes.begin (); i != textboxes.end (); ++i) {
-                    if (*i == nullptr)
-                        continue;
-
-                    (*i)->update (dt);
-
-                    // "Garbage collector" for textboxes
-                    if ((*i)->isActive () == false) {
-                        delete *i;
-                        *i = nullptr;
-                        //textboxes.erase (i);
-                    }
-                }
                 if (sf::Keyboard::isKeyPressed (sf::Keyboard::C)) {
                     if (!toggleKeys) {
                         toggleKeys = true;
@@ -123,6 +116,9 @@ class ColiforB : public Scene {
                 else {
                     toggleKeys = false;
                 }
+                for (Projectile* p : projectiles) {
+                    p->update (dt);
+                }
                 for (size_t i = entities.size() - 1; i >= 0; --i) {
                     Entity* e = entities[i];
 
@@ -130,7 +126,19 @@ class ColiforB : public Scene {
                         continue;
                     
                     e->update (dt);
+                    /*
+                    for (Projectile* p : projectiles) {
+                        if (e->getBounds ().intersects (p->getBounds ()));
+                    }*/
+                    if (e->tag == "Friend") {
+                        Friend* f = (Friend*) e;
 
+                        if (!f->isFound ()) {
+                            if (player->getBounds().intersects (f->getBounds ())) {
+                                f->setTarget ();
+                            }
+                        }
+                    }
                     if (e->isActive ())
                         if (player->getBounds().intersects (e->getBounds ()))
                             player->damage (e->getVelocity (), 1);
@@ -163,7 +171,131 @@ class ColiforB : public Scene {
                     
                }
             }
+            cleanupAllContainers ();
         }
+        void registerProjectile (Projectile* p) {
+            projectiles->push_back (p);
+        }
+        virtual void setController (std::set<sf::Keyboard::Key>* newController) {
+            controller = newController;
+            player->setController (newController);
+        }
+        void cleanupAllContainers () {
+
+            // Clear projectiles
+            size_t endIndex = projectiles.size() - 1;
+
+            for (size_t i = projectiles.size () - 1; i >= 0; --i) {
+                if (projectiles[i]->isActive ())
+                    continue;
+
+                delete projectiles[i];
+
+                projectiles[i] = projectiles[endIndex];
+                projectiles[endIndex] = nullptr;
+                --endIndex;
+            }
+
+            //Clear entites
+            endIndex = entities.size() - 1;
+
+            for (size_t i = entities.size () - 1; i >= 0; --i) {
+                if (entities[i]->isActive ())
+                    continue;
+
+                delete entities[i];
+
+                entities[i] = entities[endIndex];
+                entities[endIndex] = nullptr;
+                --endIndex;
+            }
+
+            // Clear textboxes
+            endIndex = textboxes.size() - 1;
+
+            for (size_t i = textboxes.size () - 1; i >= 0; --i) {
+                if (textboxes[i]->isActive ())
+                    continue;
+
+                delete textboxes[i];
+
+                textboxes[i] = textboxes[endIndex];
+                textboxes[endIndex] = nullptr;
+                --endIndex;
+            }
+
+        }
+        void clearProjectiles () {
+             // Clear projectiles
+            size_t endIndex = projectiles.size() - 1;
+
+            for (size_t i = projectiles.size () - 1; i >= 0; --i) {
+                if (projectiles[i]->isActive ())
+                    continue;
+
+                delete projectiles[i];
+
+                projectiles[i] = projectiles[endIndex];
+                projectiles[endIndex] = nullptr;
+                --endIndex;
+            }
+        }
+        void clearEntities () {
+
+            //Clear entites
+            endIndex = entities.size() - 1;
+
+            for (size_t i = entities.size () - 1; i >= 0; --i) {
+                if (entities[i]->isActive ())
+                    continue;
+
+                delete entities[i];
+
+                entities[i] = entities[endIndex];
+                entities[endIndex] = nullptr;
+                --endIndex;
+            }
+        }
+        void clearTextboxes () {
+            // Clear textboxes
+            endIndex = textboxes.size() - 1;
+
+            for (size_t i = textboxes.size () - 1; i >= 0; --i) {
+                if (textboxes[i]->isActive ())
+                    continue;
+
+                delete textboxes[i];
+
+                textboxes[i] = textboxes[endIndex];
+                textboxes[endIndex] = nullptr;
+                --endIndex;
+            }
+        }
+        void cleanupContainer (std::vector& container) {
+            
+        }
+        void garbageCollector () {
+            if (garbageCollectorTimer.getElapsedTime().asSeconds() > 3.0f) {
+                garbageCollectorTimer.restart();
+                clearProjectiles ();
+                clearEntities ();
+            }
+        }
+        void updateSpawners () {
+            if (spawnTimer.getElapsedTime().asSeconds() < spawnInterval)
+                return;
+            spawnEnemies ();
+            spawnTimer.restart();
+        }
+        void updateDifficulty () {
+            if (difficultyTimer.getElapsedTime().asSeconds() < gameState.getNextDifficultyTime ())
+                return;
+            difficultyTimer.restart ();
+            gameState.updateDifficulty();
+
+            //updateDifficulty ();
+        }
+        
         void spawn (Entity* e) {
             entities.push_back (e);
         }
@@ -224,23 +356,10 @@ class ColiforB : public Scene {
             return false;
 
         }
-        Entity* selectEntity (sf::Vector2f position) {
-            unsigned random = getRandom () % 1000;
-            unsigned sum = 0;
-
-            for (auto p : spawners) {
-                // Each spawner has a weight
-                int weight = std::get<1>(p);
-                // All weights should add up to 100. So we can select a random number based on this
-                sum += weight;
-
-                if (random <= sum) {
-                    Spawner* s = std::get<0>(p);
-                    s->spawn (position);
-                    break;
-                }       
-            }
+        void eventHandler (sf::Event& e) {
+            
         }
+        
         void
         spawnEnemies () {
             int magnitude = 100;
@@ -265,4 +384,21 @@ class ColiforB : public Scene {
             selectEntity(sf::Vector2f(player->getPosition().x + normalized.x, player->getPosition().y + normalized.y));
             // Select enemy, add to world at normalized location.
         }   
+        Entity* selectEntity (sf::Vector2f position) {
+            unsigned random = getRandom () % 1000;
+            unsigned sum = 0;
+
+            for (auto p : spawners) {
+                // Each spawner has a weight
+                int weight = std::get<1>(p);
+                // All weights should add up to 100. So we can select a random number based on this
+                sum += weight;
+
+                if (random <= sum) {
+                    Spawner* s = std::get<0>(p);
+                    s->spawn (position);
+                    break;
+                }       
+            }
+        }
 };

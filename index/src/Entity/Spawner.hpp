@@ -12,8 +12,10 @@ using json = nlohmann::json;
 
 class Spawner {
     private:
+        Level* level;
         unsigned difficulty = 0;
     public:
+        Spawner (Level* level) : level(level);
         ~Spawner () {
 
         }
@@ -26,8 +28,9 @@ class Spawner {
 template <class T>
 class SpawnerFor : public Spawner {
     public:
-        virtual Enemy* spawn(sf::Vector2f position) { 
-            entity_ = new T();
+        virtual T* spawn(Level* level, sf::Vector2f position) { 
+            entity_ = new T(level);
             entity_->setPosition (position);
+            level->registerObject (entity_);
         }
 };
