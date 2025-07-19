@@ -3,23 +3,21 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-#include "Enemy.hpp"
+#include "../Engine/GameObject.hpp"
 
 
 
 using json = nlohmann::json;
 
-
 class Spawner {
     private:
-        Level* level;
         unsigned difficulty = 0;
     public:
-        Spawner (Level* level) : level(level);
+        Spawner () {}
         ~Spawner () {
 
         }
-        virtual Enemy* spawn(sf::Vector2f position) = 0;
+        virtual GameObject* spawn(Level* level, sf::Vector2f position) = 0;
         void setDifficulty (unsigned newDifficulty) {
             difficulty = newDifficulty;
         }
@@ -32,5 +30,6 @@ class SpawnerFor : public Spawner {
             entity_ = new T(level);
             entity_->setPosition (position);
             level->registerObject (entity_);
+            return entity_;
         }
 };

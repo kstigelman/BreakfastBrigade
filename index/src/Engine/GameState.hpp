@@ -1,5 +1,6 @@
 #pragma once
 #include "../Entity/Spawner.hpp"
+#include "../Scenes/Level.hpp"
 
 class GameState {
     private:
@@ -7,6 +8,7 @@ class GameState {
         bool bSpawningPaused = false;
         const unsigned MAX_ENTITY_LIMIT = 100;
         unsigned currentEntityLimit = 20;
+        
     public:
         GameState () {
         }
