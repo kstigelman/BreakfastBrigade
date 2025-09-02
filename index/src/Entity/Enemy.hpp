@@ -64,12 +64,14 @@ class Enemy : public Entity
 				//healthBar.draw(window);
 			}
 		}
+		virtual void attack () = 0;
+		
 		void setTarget (Entity* targetCollider)
 		{
 			target = targetCollider;
 			//target = targetPosition;
 		}
-		std::string GetTarget () {
+		std::string getTarget () {
 			if (target == nullptr)
 				return getName () + " has no target.";
 			return getName () + " is targetting " + target->getName () + " at position: " + target->printPosition ();

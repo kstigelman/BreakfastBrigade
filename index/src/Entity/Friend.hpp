@@ -6,7 +6,7 @@ class Friend : public Entity {
         bool bFound = false;
         Entity* target;
     public:
-        Friend () {
+        Friend (Level* scene) : Entity (scene) {
             tag = "Friend";
         }
         ~Friend () {

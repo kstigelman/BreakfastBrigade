@@ -39,10 +39,14 @@ class TileMap : public sf::Drawable, public sf::Transformable
         int getTileWidth () {
 
         }
-        Tile* getAtCoordinate (int x, int y) {
-            sf::Vector2i castCoordinates = sf::Vector2i (x % tileSizePx.x, y % tileSizePx.y);
-            return &tiles[x + (y * mapSize.x)];
-        }   
+        Tile* getAtCoordinate (float x, float y) {
+            sf::Vector2i castCoordinates = convertToTileCoords (x, y);
+            return &tiles[castCoordinates.x + (castCoordinates.y * mapSize.x)];
+        }
+        sf::Vector2i convertToTileCoords (float x, float y) {
+            return sf::Vector2i ((int) x % tileSizePx.x, (int) y % tileSizePx.y);
+        }
+           
     private:
         int borderWidth = 4;
         Tile* tiles;

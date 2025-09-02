@@ -98,7 +98,7 @@ class Entity : public GameObject
 
 		}
 		virtual void spawn (Scene* scene) {
-			level->registerObject (this);
+			scene->registerObject (this);
 		}
 		virtual void init ()
 		{

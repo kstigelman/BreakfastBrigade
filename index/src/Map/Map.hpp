@@ -32,6 +32,9 @@ class Map
 		TileMap* getTileMap () {
 			return &tilemap;
 		}
+		bool isBlockedAt (float x, float y) {
+			return tilemap.getAtCoordinate ((int) x % 32, (int) y % 32)->collidable;
+		}
 		void loadWalls () {
 			sf::Vertex* quad = &walls[0];
 

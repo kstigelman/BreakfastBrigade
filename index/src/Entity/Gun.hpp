@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Shot.hpp"
+#include "Projectile.hpp"
 
 class Gun {
     private:
@@ -15,7 +15,7 @@ class Gun {
         SpawnerFor<Projectile*>* projectileSpawner;
     public:
         Gun (Level* scene, float damage = 1.0, float bulletSpeed = 1.0) : scene(scene), damage(damage), bulletSpeed(bulletSpeed) {
-            scene->registerObject ();
+            //scene->registerObject ();
         }
         ~Gun () {
 
@@ -25,7 +25,7 @@ class Gun {
                 return;
 
             reloadClock.restart();
-            scene->registerProjectile (new Projectile (direction, damage));
+            scene->registerProjectile (new Projectile (scene, direction));
         }
         bool canShoot () {
             return reloadClock.getElapsedTime( ).asSeconds () >= reloadTime;

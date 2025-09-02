@@ -35,7 +35,7 @@ class Player : public Entity
 		float invincibilityCooldown = 1.f;
 		double kbMult = 2000.f;
 
-		td::vector<sf::Keyboard::Key>* controller;
+		std::vector<sf::Keyboard::Key>* controller;
 	public:
 		std::vector<Shot> bullets;
 		bool canMoveUp = true;
@@ -70,7 +70,7 @@ class Player : public Entity
 			//animator = Animator (texture, sprite, 2, 2);
 		}*/
 		Player(Level* world, std::string character, int id = 1)
-		: Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
+		: Entity (world, sf::RectangleShape (sf::Vector2f (8, 16))), gun(world)
 		{
 			Entity::setName ("Player");
 			//hud = PlayerHUD (&healthbar);
@@ -141,7 +141,7 @@ class Player : public Entity
 			else
 				canMoveDown = true;
 			*/
-			processInput ();
+			processInput (dt);
 			//movement(controller, dt);
 
 
@@ -188,7 +188,7 @@ class Player : public Entity
 			return keys;
 		}
 		std::set<int> &getInputs () {
-			return inputs;
+			//return inputs;
 		}
 		int pressingButton()
 		{
@@ -213,7 +213,7 @@ class Player : public Entity
 				return 7;
 			return 0;
 		}
-		void processInput () {
+		void processInput (float dt) {
 			if (controller == nullptr) 
 				return;
 
@@ -247,7 +247,7 @@ class Player : public Entity
 				shoot (sf::Vector2f (0, 100));
 			}
 			else if (controller->count (SHOOT_RIGHT)) {
-				shoot (sf::Vector2f (100 * dt));
+				shoot (sf::Vector2f (100 * dt, 0));
 			}
 
 
@@ -256,7 +256,7 @@ class Player : public Entity
 		}
 		void movement(float dt)
 		{
-			inputs = keysPressed ();
+			//inputs = keysPressed ();
 
 			if (controller == nullptr) 
 				return;
@@ -334,7 +334,7 @@ class Player : public Entity
 		}
 		void shoot(sf::Vector2f direction)
 		{
-			gun.shoot ();
+			gun.shoot (direction);
 			/*
 			int direction = shootDirection();
 			if(direction != 0)

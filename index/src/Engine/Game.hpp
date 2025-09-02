@@ -55,7 +55,7 @@ class Game
 			Scene* oldScene = settings.currentScene;
 			settings.currentScene = newScene;
 			
-			currentScene->setController (&input);
+			settings.currentScene->setController (&input);
 
 			if (oldScene == nullptr)
 				return;
@@ -99,7 +99,6 @@ class Game
 					if (sf::Keyboard::isKeyPressed (sf::Keyboard::P)) {
 						state = 1;
 					}
-
 
 
 					if (sf::Keyboard::isKeyPressed (MOVE_UP))
@@ -222,6 +221,5 @@ class Game
 					player->bullets.erase(player->bullets.begin() + i);
 				}****
 			}*/
-		}
-		
+		}	
 };
