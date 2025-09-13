@@ -17,6 +17,8 @@ class ColiforB : public Level {
         GameState gameState;
 
         Map map;
+        TileMap* tilemap;
+
         Player* player;
         Ship ship = Ship (this);
         //Broccoli* enemy;
@@ -42,11 +44,17 @@ class ColiforB : public Level {
         std::vector<std::tuple<Spawner*, int>> spawners;
     public:
         ColiforB (GameSettings* gameSettings, std::string character) : Level (gameSettings) {
+            printf ("ColiforB: Constructor");
+            
             setName ("COLIFOR-B");
             
 
             player = new Player (this, character);
+            
             player->setController (getController ());
+            
+
+            registerObject (new Broccoli (this, player));
             //enemy = new Broccoli (1, 50.f);
             //enemy2 = new Broccoli ();
 
@@ -56,12 +64,15 @@ class ColiforB : public Level {
             
             textboxes.push_back (new TextBox ("COLIFOR-B", sf::Vector2f (0, -110), 5, 24, sf::Color::White, true));
             textboxes.push_back (new TextBox ("The Verdant Forest", sf::Vector2f (0, -90), 5, 14, sf::Color::White, true));
+            
+            tilemap = map.getTileMap ();
+
             std::cout << "Scene loaded: " << getName() << std::endl;
 
             difficultyTimer.restart();
         }
         ~ColiforB () {
-           //delete player;
+           delete player;
 
             /*for (Projectile* p : projectiles) {
                 if (p == nullptr)
@@ -93,15 +104,16 @@ class ColiforB : public Level {
             //entities.clear ();
         }
         void update (float dt) override {
+            for (TextBox* tb : textboxes)
+                tb->update (dt);
+
             if (!player->isDead ()) {
                 player->update (dt);
 
                 ship.update (dt);
 
-                updateSpawners ();
-                updateDifficulty ();
-
-                garbageCollector ();
+                //updateSpawners ();
+                //updateDifficulty ();
                 
                 if (sf::Keyboard::isKeyPressed (sf::Keyboard::C)) {
                     if (!toggleKeys) {
@@ -123,17 +135,22 @@ class ColiforB : public Level {
                 /*for (Projectile* p : projectiles) {
                     p->update (dt);
                 }*/
+
                 auto entities = getGameObjects ();
-                for (size_t i = entities.size() - 1; i >= 0; --i) {
+                
+                for (int i = entities.size() - 1; i >= 0; --i) {
                     Entity* e = (Entity*) entities[i];
 
                     if (e == nullptr || !e->isActive ())
                         continue;
                     
                     e->update (dt);
-                   
                     // Check tilemap collision
-                
+                    if (!tilemap->isCoordinateOutsideOfMap (e->getPosition ())) {
+                        if (tilemap->isTargetBlocked (e->getCollider ())) {
+                            e->getCollider ().setBlocked (true);
+                        }
+                    }
                     // Check for friends
                     if (e->getTags ().count ("Friend")) {
                         Friend* f = (Friend*) e;
@@ -149,7 +166,7 @@ class ColiforB : public Level {
                         if (player->getBounds().intersects (e->getBounds ()))
                             player->damage (e->getVelocity (), 1);
                 
-                        for (size_t i = 0; i < player->bullets.size (); i++)
+                        for (int i = 0; i < player->bullets.size (); i++)
                         {
                             if (player->bullets[i].isColliding (e)) {
                                 e->damage (player->getPosition (), 1);
@@ -165,6 +182,7 @@ class ColiforB : public Level {
 
                         }
                     }
+                    
                 }
                 /*if (player->getInputs ().find (6) != player->getInputs ().end()) {
                     if (ship.getInteractionZone().isColliding (player->getCollider ())) {
@@ -221,9 +239,8 @@ class ColiforB : public Level {
             }
             */
             // Clear textboxes
-            size_t endIndex = textboxes.size() - 1;
-
-            for (size_t i = textboxes.size () - 1; i >= 0; --i) {
+            /*size_t endIndex = textboxes.size() - 1;
+            for (int i = textboxes.size () - 1; i >= 0; --i) {
                 if (textboxes[i]->isActive ())
                     continue;
 
@@ -232,7 +249,8 @@ class ColiforB : public Level {
                 textboxes[i] = textboxes[endIndex];
                 textboxes[endIndex] = nullptr;
                 --endIndex;
-            }
+            }*/
+        
 
         }
         void clearProjectiles () {
@@ -297,13 +315,18 @@ class ColiforB : public Level {
             spawnEnemies ();
             spawnTimer.restart();
         }
-        void updateDifficulty () {
+
+        void
+        updateDifficulty () {
             if (difficultyTimer.getElapsedTime().asSeconds() < gameState.getNextDifficultyTime ())
                 return;
-            difficultyTimer.restart ();
+
+             difficultyTimer.restart ();
             gameState.incrementDifficulty();
 
-            //updateDifficulty ();
+            Spawner* newSpawner = getSpawnerForDifficulty (gameState.getDifficulty());
+            if (newSpawner != nullptr)
+                addSpawner (newSpawner, 1);
         }
 
         void spawn (Entity* e) {
@@ -325,7 +348,7 @@ class ColiforB : public Level {
 
             
             player->draw (window);
-           
+
             //enemy->draw (window);
             //enemy->getCollider().shouldDraw = true;
             //player->getCollider().shouldDraw = true;
@@ -334,22 +357,16 @@ class ColiforB : public Level {
                     e->draw (window);
             }
             for (TextBox* tb : textboxes) {
-                if (tb != nullptr)
+                if (tb != nullptr && tb->isActive ())
                     tb->draw (window);
             }
+
             window.setView (player->getCamera ());
         }
         void eventHandler (sf::Event& e) override {
             getRegistry()->eventHandler (e);
         }
-        void
-        updateDifficulty () {
-            gameState.incrementDifficulty();
 
-            Spawner* newSpawner = getSpawnerForDifficulty (gameState.getDifficulty());
-            if (newSpawner != nullptr)
-                addSpawner (newSpawner, 1);
-        }
         Spawner* getSpawnerForDifficulty (unsigned diff) {
             switch (diff) {
                 case 1:
@@ -365,9 +382,6 @@ class ColiforB : public Level {
             
             return false;
 
-        }
-        void eventHandler (sf::Event& e) {
-            
         }
         
         void
@@ -410,5 +424,6 @@ class ColiforB : public Level {
                     break;
                 }       
             }
+            return nullptr;
         }
 };

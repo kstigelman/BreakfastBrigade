@@ -1,5 +1,8 @@
 #pragma once
+#include <math.h>
+
 #include "Entity.hpp"
+
 
 class Friend : public Entity {
     private:
@@ -39,7 +42,7 @@ class Friend : public Entity {
         bool isFound () {
             return bFound;
         }
-        bool setFound (bool newVal) {
+        void setFound (bool newVal) {
             bFound = newVal;
         }
         Entity* getTarget () {

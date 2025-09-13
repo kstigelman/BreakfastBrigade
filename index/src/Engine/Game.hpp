@@ -42,7 +42,13 @@ class Game
 			window.create(sf::VideoMode(settings.WIDTH, settings.HEIGHT), title);
 			musicManager ();
 
-			settings.currentScene = new MainMenu (&settings);
+			if (!state) {
+				settings.currentScene = new MainMenu (&settings);
+			}
+			else {
+				settings.currentScene = new ColiforB (&settings, "Bacon");
+			}
+		
 		}
 		~Game()
 		{
@@ -101,7 +107,7 @@ class Game
 					}
 
 
-					if (sf::Keyboard::isKeyPressed (MOVE_UP))
+					/*if (sf::Keyboard::isKeyPressed (MOVE_UP))
 						input.insert (MOVE_UP);
 				
 					if (sf::Keyboard::isKeyPressed (MOVE_DOWN))
@@ -115,7 +121,7 @@ class Game
 
 					if (sf::Keyboard::isKeyPressed (SELECT_BUTTON))
 						input.insert (SELECT_BUTTON);
-						
+						*/
 					if (sf::Mouse::isButtonPressed (sf::Mouse::Left))
 						settings.bLeftClicked = true;
 				}
@@ -148,10 +154,12 @@ class Game
 			{	
 				eventManager ();
 				update();
+				
 				if (quit == true)
 					return;
-				draw();
 
+				draw();
+				
 				/*if (state == 0) {
 					title.update (deltaTime);
 					window.clear();
@@ -198,6 +206,7 @@ class Game
 				}
 				else {
 					setScene (new ColiforB (&settings, "Bacon"));
+					state += 1;
 				}
 					
 			}	

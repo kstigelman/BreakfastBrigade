@@ -28,8 +28,8 @@ class GameObject{
         void setPosition (sf::Vector2f pos) {
             transform.position = pos;
         }
-        Transform& getTransform () {
-            return transform;
+        Transform* getTransform () {
+            return &transform;
         }
         bool canDraw () {
             return bDraw;

@@ -20,7 +20,7 @@ class Ship : public Entity {
 
         HealthBar healthbar;
     public:
-        Ship (Scene* world) : Entity (world, sf::RectangleShape (sf::Vector2f (30, 15))) {
+        Ship (Level* world) : Entity (world, sf::RectangleShape (sf::Vector2f (30, 15))) {
             texture.loadFromFile ("resources/sprites/destroyed_ship.png");
             sprite.setTexture (texture);
             sprite.setScale (2, 2);

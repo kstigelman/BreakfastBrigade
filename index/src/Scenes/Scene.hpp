@@ -27,7 +27,7 @@ protected:
     bool exitScene = false;
 public:
     Scene (GameSettings* gameSettings) : gameSettings(gameSettings), uiRegistry (gameSettings) {
-        
+        printf ("Scene: Constructor");
     }
     ~Scene () {
         for (GameObject* o : objectCollection) {
@@ -112,9 +112,5 @@ public:
     void addElement (UIElement* e) {
         uiRegistry.add (e);
     }
-    std::set<sf::Keyboard::Key>* getController () {
-        return controller;
-    }
-
 
 };

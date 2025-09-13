@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Projectile.hpp"
+#include "Spawner.hpp"
 
 class Gun {
     private:

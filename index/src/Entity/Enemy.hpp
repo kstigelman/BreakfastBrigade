@@ -20,7 +20,8 @@ class Enemy : public Entity
 
 		
 	public:
-		Enemy(class Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16)))
+		Enemy(class Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16))), 
+		pathfinderComponent (world, &transform, target->getTransform ())
 		{
 
 			sprite.setPosition(sf::Vector2f(200, 100));
@@ -76,6 +77,9 @@ class Enemy : public Entity
 				return getName () + " has no target.";
 			return getName () + " is targetting " + target->getName () + " at position: " + target->printPosition ();
 		}
+		PathfinderComponent* getPathfinderComponent () {
+			return &pathfinderComponent;
+		}
 		void pathfinding (float dt)
 		{
 			if (target == nullptr) {
@@ -123,7 +127,9 @@ class Enemy : public Entity
 		{
 			if (isActive())
 			{
-				pathfinding (dt);
+				pathfinderComponent.update (dt);
+				
+				// pathfinding (dt);
 				Entity::update (dt);
 				move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
 				if (velocity != sf::Vector2f (0, 0))

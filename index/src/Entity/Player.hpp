@@ -35,7 +35,6 @@ class Player : public Entity
 		float invincibilityCooldown = 1.f;
 		double kbMult = 2000.f;
 
-		std::vector<sf::Keyboard::Key>* controller;
 	public:
 		std::vector<Shot> bullets;
 		bool canMoveUp = true;
@@ -112,9 +111,7 @@ class Player : public Entity
 			//delete gui;
 		}
 
-		void setController (std::set<sf::Keyboard::Key> *newController) {
-			controller = newController;
-		}
+
 		void update(float dt)
 		{
 			//hitbox.setPosition(sprite.getPosition());
@@ -187,9 +184,6 @@ class Player : public Entity
 
 			return keys;
 		}
-		std::set<int> &getInputs () {
-			//return inputs;
-		}
 		int pressingButton()
 		{
 			if (sf::Keyboard::isKeyPressed (sf::Keyboard::W))
@@ -214,22 +208,24 @@ class Player : public Entity
 			return 0;
 		}
 		void processInput (float dt) {
-			if (controller == nullptr) 
+			/*if (controller == nullptr || controller->empty()) {
+				moving = false;
 				return;
+			}*/
 
-			if (controller->count (MOVE_UP)) {
+			if (sf::Keyboard::isKeyPressed (MOVE_UP)) {
 				move (sf::Vector2f (0, -100 * dt));
 				moving = true;
 			}
-			else if (controller->count (MOVE_LEFT)) {
+			else if (sf::Keyboard::isKeyPressed (MOVE_LEFT)) {
 				move (sf::Vector2f (-100 * dt, 0));
 				moving = true;
 			}
-			else if (controller->count (MOVE_DOWN)) {
+			else if (sf::Keyboard::isKeyPressed (MOVE_DOWN)) {
 				move (sf::Vector2f (0, 100 * dt));
 				moving = true;
 			}
-			else if (controller->count (MOVE_RIGHT)) {
+			else if (sf::Keyboard::isKeyPressed (MOVE_RIGHT)) {
 				move (sf::Vector2f (100 * dt, 0));
 				moving = true;
 			}
@@ -237,16 +233,16 @@ class Player : public Entity
 				moving = false;
 			}
 
-			if (controller->count (SHOOT_UP)) {
+			if (sf::Keyboard::isKeyPressed (SHOOT_UP)) {
 				shoot (sf::Vector2f (0, -100));
 			}
-			else if (controller->count (SHOOT_LEFT)) {
+			else if (sf::Keyboard::isKeyPressed (SHOOT_LEFT)) {
 				shoot (sf::Vector2f (-100 * dt, 0));
 			}
-			else if (controller->count (SHOOT_DOWN)) {
+			else if (sf::Keyboard::isKeyPressed (SHOOT_DOWN)) {
 				shoot (sf::Vector2f (0, 100));
 			}
-			else if (controller->count (SHOOT_RIGHT)) {
+			else if (sf::Keyboard::isKeyPressed (SHOOT_RIGHT)) {
 				shoot (sf::Vector2f (100 * dt, 0));
 			}
 

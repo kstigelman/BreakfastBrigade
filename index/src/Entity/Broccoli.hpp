@@ -9,7 +9,7 @@ class Broccoli : public Enemy
 	protected:
 	
 	public:
-		Broccoli(Level* world, Entity* entityTarget, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
+		Broccoli(Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
 		{
 			//setName ("Broccoli" + std::to_string (id));
 			setPosition(getPosition());
@@ -35,6 +35,9 @@ class Broccoli : public Enemy
 		~Broccoli()
 		{
 			
+		}
+		virtual void attack () override {
+
 		}
 	
 	

@@ -2,28 +2,33 @@
 
 #include <SFML/Graphics.hpp>
 #include "Tile.hpp"
+#include "Collider.hpp"
 
 class TileMap : public sf::Drawable, public sf::Transformable
 {
     public:
         TileMap (int width, int height) {
+            printf ("TileMap: Constructor");
             size = width * height;
             mapSize = sf::Vector2i (width, height);
             tiles = new Tile[width * height];
-            Tile tile;
+           
+
             for (size_t j = 0; j < height; ++j) {
                 for (size_t i = 0; i < width; ++i) {
-                    tile.position = sf::Vector2i (i, j);
-                    tile.tilePosition = sf::Vector2f (i * tileWidth, j * tileWidth);
+                    Tile* tile = &tiles[i + (j * width)];
+                    tile->position = sf::Vector2i (i, j);
+                    tile->tilePosition = sf::Vector2f (i * tileWidth, j * tileWidth);
                     
                     if (i < borderWidth || i > width - borderWidth - 1 || j < borderWidth || j > height - borderWidth - 1) {
-                        tile.collidable = true;
-                        tile.tileType = 1;
+                        tile->collidable = true;
+                        tile->tileType = 1;
                     }
-                    tiles[i + (j * width)] = tile;
+                    //tiles[i + (j * width)] = tile;
                 }
             }
-            load ("resources/sprites/Tiles.png", "N/A", sf::Vector2i (32, 32), width, height, sf::Vector2f (0, 0));
+            load ("resources/sprites/Tiles.png", "N/A", sf::Vector2i (24, 24), width, height, sf::Vector2f (0, 0));
+
         }
         ~TileMap () {
             delete[] tiles;
@@ -37,14 +42,40 @@ class TileMap : public sf::Drawable, public sf::Transformable
             return scale;
         }
         int getTileWidth () {
-
+            return tileWidth;
         }
-        Tile* getAtCoordinate (float x, float y) {
+        Tile* getTileAtCoordinate (float x, float y) {
             sf::Vector2i castCoordinates = convertToTileCoords (x, y);
             return &tiles[castCoordinates.x + (castCoordinates.y * mapSize.x)];
         }
+        Tile* getTileAtCoordinate (sf::Vector2f position) {
+            return getTileAtCoordinate (position.x, position.y);
+        }
         sf::Vector2i convertToTileCoords (float x, float y) {
-            return sf::Vector2i ((int) x % tileSizePx.x, (int) y % tileSizePx.y);
+            return sf::Vector2i ((int) (x - initPos.x) % tileSizePx.x, (int) (y - initPos.y) % tileSizePx.y);
+        }
+        bool isCoordinateOutsideOfMap (float x, float y) {
+            return (x < initPos.x || 
+                    y < initPos.y || 
+                    x > initPos.x + (mapSize.x * tileSizePx.x) || 
+                    y > initPos.y + (mapSize.y * tileSizePx.y));
+        } 
+        bool isCoordinateOutsideOfMap (sf::Vector2f position) {
+            return isCoordinateOutsideOfMap (position.x, position.y);
+        }
+        bool isTargetBlocked (Collider& collider) {
+            if (isCoordinateOutsideOfMap (collider.getPosition ()))
+                return false;
+           
+            sf::Vector2f* points = collider.getFourCorners ();
+
+            if (getTileAtCoordinate (points[0])->collidable || 
+                getTileAtCoordinate (points[1])->collidable || 
+                getTileAtCoordinate (points[2])->collidable || 
+                getTileAtCoordinate (points[4])->collidable)
+                return true;
+            
+            return false;
         }
            
     private:
@@ -55,7 +86,7 @@ class TileMap : public sf::Drawable, public sf::Transformable
 		sf::Vector2i mapSize;
 		sf::Vector2i tileSizePx;
 		int tileWidth;
-		sf::Vector2f initPos;
+		sf::Vector2f initPos = sf::Vector2f (0.0, 0.0);
         int scale = 1;
 
         int size = 0;
@@ -78,11 +109,13 @@ class TileMap : public sf::Drawable, public sf::Transformable
 
 			if(!mTexture.loadFromFile(tileset)) //Loads TileSet texture
 			{
+                printf ("TileMap: Cannot open tileset\n");
 				return false;
 			}
 			mVerticies.setPrimitiveType(sf::Quads);
 			mVerticies.resize(mapWidth * mapHeight * tileWidth);
 
+            printf ("TileMap: Populating VertexArray\n");
 			for(int j = 0; j < mapHeight; j++)
 			{
 				for(int i = 0; i < mapWidth; i++)

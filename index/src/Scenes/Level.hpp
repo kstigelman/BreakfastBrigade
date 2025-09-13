@@ -6,8 +6,8 @@ class Level : public Scene {
     protected:
         Map map;
     public:
-        Level (class GameSettings* gameSettings) : Scene (gameSettings) {
-
+        Level (GameSettings* gameSettings) : Scene (gameSettings) {
+            printf ("Level: Constructor");
         }
         Map* getMap () {
             return &map;

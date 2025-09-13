@@ -8,9 +8,9 @@
 
 struct Tile {
     // This is it's tile map location
-    sf::Vector2f tilePosition;
+    sf::Vector2f tilePosition = sf::Vector2f (0.0, 0.0);
     // This is it's world location (tilePosition * tile_width)
-    sf::Vector2i position;
+    sf::Vector2i position = sf::Vector2i (0, 0);
     int tileType = 0; // AIR
 	bool collidable = false;
 };

@@ -119,8 +119,10 @@ class Entity : public GameObject
 		}
 		virtual void update (float dt) {
 			sf::Vector2f prevPosition = getPosition();
+
 			move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
 
+			// Check ColiforB.hpp update and Collider.hpp isBlocked method.
 			if (collider.isBlocked())
 				setPosition (prevPosition);
 		}
