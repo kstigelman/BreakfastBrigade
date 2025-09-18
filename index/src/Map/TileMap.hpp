@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <fstream>
 #include "Tile.hpp"
 #include "Collider.hpp"
 
@@ -12,21 +13,34 @@ class TileMap : public sf::Drawable, public sf::Transformable
             size = width * height;
             mapSize = sf::Vector2i (width, height);
             tiles = new Tile[width * height];
-           
+                                           
+            tileWidth = 24;
+            
+            std::ifstream input;
+            char* readArray = new char[width * height];
+            input.open ("resources/world/world1.txt");
 
             for (size_t j = 0; j < height; ++j) {
                 for (size_t i = 0; i < width; ++i) {
                     Tile* tile = &tiles[i + (j * width)];
                     tile->position = sf::Vector2i (i, j);
                     tile->tilePosition = sf::Vector2f (i * tileWidth, j * tileWidth);
-                    
+                    /*
                     if (i < borderWidth || i > width - borderWidth - 1 || j < borderWidth || j > height - borderWidth - 1) {
+                        tile->collidable = true;
+                        tile->tileType = 1;
+                    }*/
+            
+                    input >> readArray[i + j * width];
+
+                    if (readArray[i + j * width] == '1') {
                         tile->collidable = true;
                         tile->tileType = 1;
                     }
                     //tiles[i + (j * width)] = tile;
                 }
             }
+            input.close ();
             load ("resources/sprites/Tiles.png", "N/A", sf::Vector2i (24, 24), width, height, sf::Vector2f (0, 0));
 
         }
@@ -51,8 +65,23 @@ class TileMap : public sf::Drawable, public sf::Transformable
         Tile* getTileAtCoordinate (sf::Vector2f position) {
             return getTileAtCoordinate (position.x, position.y);
         }
+        Tile* getTileAt (sf::Vector2i position) {
+            return &tiles[position.x + (position.y * mapSize.x)];
+        }
+        Tile* getTileAt (int x, int y) {
+            return &tiles[x + (y * mapSize.x)];
+        }
         sf::Vector2i convertToTileCoords (float x, float y) {
-            return sf::Vector2i ((int) (x - initPos.x) % tileSizePx.x, (int) (y - initPos.y) % tileSizePx.y);
+            return sf::Vector2i ((int) ((x - initPos.x) / tileSizePx.x), (int) ((y - initPos.y) / tileSizePx.y));
+        }
+        sf::Vector2i convertToTileCoords (sf::Vector2f position) {
+            return sf::Vector2i ((int) ((position.x - initPos.x) / tileSizePx.x), (int) ((position.y - initPos.y) / tileSizePx.y));
+        }
+        sf::Vector2f convertToWorldCoords (sf::Vector2i position) {
+            return sf::Vector2f ((position.x * tileSizePx.x) + initPos.x,  (position.y * tileSizePx.y) + initPos.y);
+        }
+        sf::Vector2f convertToWorldCoords (int x, int y) {
+            return sf::Vector2f ((x * tileSizePx.x) + initPos.x,  (y * tileSizePx.y) + initPos.y);
         }
         bool isCoordinateOutsideOfMap (float x, float y) {
             return (x < initPos.x || 
@@ -67,12 +96,12 @@ class TileMap : public sf::Drawable, public sf::Transformable
             if (isCoordinateOutsideOfMap (collider.getPosition ()))
                 return false;
            
-            sf::Vector2f* points = collider.getFourCorners ();
+            std::vector<sf::Vector2f> points = collider.getFourCorners ();
 
             if (getTileAtCoordinate (points[0])->collidable || 
                 getTileAtCoordinate (points[1])->collidable || 
                 getTileAtCoordinate (points[2])->collidable || 
-                getTileAtCoordinate (points[4])->collidable)
+                getTileAtCoordinate (points[3])->collidable)
                 return true;
             
             return false;
@@ -115,13 +144,16 @@ class TileMap : public sf::Drawable, public sf::Transformable
 			mVerticies.setPrimitiveType(sf::Quads);
 			mVerticies.resize(mapWidth * mapHeight * tileWidth);
 
+
+
+
             printf ("TileMap: Populating VertexArray\n");
 			for(int j = 0; j < mapHeight; j++)
 			{
 				for(int i = 0; i < mapWidth; i++)
 				{
                     // Logic for calculating tile type on a sprite sheet
-                    
+
 					int nTileCount = tiles[i + j * mapWidth].tileType;
                         
 					int tMod = nTileCount % (mTexture.getSize().x / tileSize.x);

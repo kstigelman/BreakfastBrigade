@@ -16,16 +16,19 @@ class Enemy : public Entity
 		HealthBar healthBar;
 		//Animator animator;
 		Entity* target;
-		
+
+		sf::Clock moveTimer;
 
 		
 	public:
 		Enemy(class Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Entity (world, sf::RectangleShape (sf::Vector2f (8, 16))), 
-		pathfinderComponent (world, &transform, target->getTransform ())
+		pathfinderComponent (world, &getCollider ())
 		{
 
-			sprite.setPosition(sf::Vector2f(200, 100));
+			setPosition(sf::Vector2f(200, 150));
 			setTarget (entityTarget);
+			if (entityTarget != nullptr)
+				pathfinderComponent.setTarget (&entityTarget->getCollider ());
 			//movementSpeed = 20;
 			//texture.loadFromFile("resources/sprites/Enemy.png");
 			//sprite.setTexture(texture);
@@ -127,11 +130,24 @@ class Enemy : public Entity
 		{
 			if (isActive())
 			{
-				pathfinderComponent.update (dt);
-				
 				// pathfinding (dt);
 				Entity::update (dt);
-				move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
+
+				sf::Vector2f prevPosition = getPosition ();
+
+				//normalizeVelocityToPosition (pathfinderComponent.getNextPosition ());
+				//move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
+				pathfinderComponent.update (dt);
+
+				if (moveTimer.getElapsedTime ().asSeconds () > 0.8f) {
+					setPosition (pathfinderComponent.getNextPosition ());
+					moveTimer.restart ();
+				}
+				
+
+				if (collider.isBlocking ())
+					setPosition (prevPosition);
+					
 				if (velocity != sf::Vector2f (0, 0))
 					animator.nextFrame ();
 				healthBar.update(dt, getPosition());
@@ -147,6 +163,7 @@ class Enemy : public Entity
 				}
 			}
 		}
+		
 		
 		/*
 		Enemy& operator=(const Enemy& rhs) {

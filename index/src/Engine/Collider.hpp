@@ -55,18 +55,17 @@ class Collider {
 		clear () {
 			mask = 0;
 		}
-		sf::Vector2f* getFourCorners () {
+		std::vector<sf::Vector2f> getFourCorners () {
 			float width = hitbox.getGlobalBounds().width;
 			float height = hitbox.getGlobalBounds().height;
 			float left = hitbox.getGlobalBounds().left;
 			float top = hitbox.getGlobalBounds().top;
 
-			sf::Vector2f corners[4] = {
-				sf::Vector2f (left, top),
-				sf::Vector2f (left + width, top),
-				sf::Vector2f (left + width, top + height),
-				sf::Vector2f (left, top + height)
-			};
+			std::vector<sf::Vector2f> corners;
+			corners.push_back (sf::Vector2f (left, top));
+			corners.push_back (sf::Vector2f (left + width, top));
+			corners.push_back (sf::Vector2f (left + width, top + height));
+			corners.push_back (sf::Vector2f (left, top + height));
 			
 			return corners;
 		} 

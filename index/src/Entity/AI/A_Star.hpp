@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <SFML/Graphics.hpp>
-
+#include "../../Map/TileMap.hpp"
 
 /* A* Search Algorithm
         1.  Initialize the open list
@@ -44,26 +44,63 @@
 
 class A_Star {
     public:
-        A_Star () {
+        A_Star (TileMap* map) : mMap (map) {
 
         }
-        sf::Vector2i nextDirection (sf::Vector2i start, sf::Vector2i goal) {
+        std::vector<sf::Vector2i> getPath (sf::Vector2i start, sf::Vector2i goal) {
+ 
+            /*
+            if (!hasGoalChanged(goal)) {
+                if (mPath.size () <= 1)
+                    return mPath;
+                if (start == mPath[0])
+                    mPath.erase (mPath.begin ());
+                return mPath;
+            }*/
+            if (mPath.size() > 0) {
+                prevNodes[1] = prevNodes[0];
+                prevNodes[0] = mPath[0];
+            }
+            mPath.clear ();    
+
+            mStart = start;
+            mGoal = goal;
+
             std::vector<Node> openList; // 1.  Initialize the open list
             std::vector<Node> closedList; // 2.  Initialize the closed list
             
             // put the starting node on the open list (you can leave its f at zero)
-            openList.push_back ({nullptr, start});
+            openList.push_back ({nullptr, start, 0, 0, manhattanDistance (start, goal)});
             
             Node found;
             bool done = false;
+            int count = 0;
             // 3.  while the open list is not empty
-            while (!openList.empty () || !done) {
+            while (!openList.empty () && !done && count < depthLimit) {
+                ++count;
                 // a) find the node with the least f on the open list, call it "q"
                 int q_index = findLeastF (&openList);
 
+                if (q_index < 0) {
+                    found = openList[0];
+                    done = true;
+                    break;
+                }
                 // b) pop q off the open list
-                Node q = pop (&openList, q_index);
+                //Node q = pop (&openList, q_index);
+                Node q = openList.at (q_index);
+                openList.erase (openList.begin () + q_index);
+                   
+                closedList.push_back (q);  
+                if (q.position != start)
+                    mPath.push_back (q.position);
+                
+                if (q.position == goal) {
+                    done = true;
+                    break;
+                }
 
+            
                 // c) generate q's 8 successors and set their parents to q
                 std::vector<Node> successors = generateSuccessors (q);
 
@@ -77,11 +114,15 @@ class A_Star {
                         done = true;
                         break;
                     }
+                    //if (prevNodes[0] == s.position)
+                    //    continue;
+                    //if (prevNodes[1] == s.position)
+                    //    continue;
                     // ii) else, compute both g and h for successor 
                     //         successor.g = q.g + distance between successor and q
-                    s.g = q.g + distance (s.position, q.position);
+                    s.g = distance (s.position, start);
                     // successor.h = distance from goal to successor
-                    s.h = manhattanDistance (s.position, q.position);
+                    s.h = manhattanDistance (s.position, goal);
                     // successor.f = successor.g + successor.h
                     s.f = s.g + s.h;
 
@@ -94,22 +135,32 @@ class A_Star {
                     if (existsWithLowerF (&closedList, s))
                         continue;
                     
+                    
                     openList.push_back (s);
                 }
                 // e) push q on the closed list
-                closedList.push_back (q);
+
             }
-            return found.position;
+            return mPath;
         }
         
     private:
+
         struct Node {
             Node* parent;
             sf::Vector2i position;
-            int f = 0;
-            int g = 0;
-            int h = 0;
+            float f = 0;
+            float g = 0;
+            float h = 0;
         };
+        std::vector<sf::Vector2i> mPath;
+        sf::Vector2i mStart;
+        sf::Vector2i mGoal;
+        TileMap* mMap;
+
+        int depthLimit = 20;
+
+        sf::Vector2i prevNodes[2] = { sf::Vector2i (0, 0) };
 
         int findLeastF (std::vector<Node>* list) {
             if (list->empty ())
@@ -118,14 +169,13 @@ class A_Star {
             int smallest = 0;
             
             for (size_t i = 1; i < list->size (); ++i) {
-                if (list->at (i).f > list->at (smallest).f)
+                if (list->at (i).f < list->at (smallest).f)
                     smallest = i;
             }
             return smallest;
         }
-
-        std::vector<Node> open () {
-
+        bool hasGoalChanged (sf::Vector2i newGoal) {
+            return newGoal != mGoal;
         }
         Node pop (std::vector<Node>* list, int index) {
             Node node = list->at (index);
@@ -136,20 +186,31 @@ class A_Star {
         std::vector<Node> generateSuccessors (Node& q) {
             std::vector<Node> list;
 
+            Node right = {&q, q.position + sf::Vector2i (1, 0)};
+            Node left = {&q, q.position + sf::Vector2i (-1, 0)};
+            Node down = {&q, q.position + sf::Vector2i (0, 1)};
+            Node up = {&q, q.position + sf::Vector2i (0, -1)};
             
-            list.push_back ({&q, q.position + sf::Vector2i (1, 0)});
-            list.push_back ({&q, q.position + sf::Vector2i (-1, 0)});
-            list.push_back ({&q, q.position + sf::Vector2i (0, 1)});
-            list.push_back ({&q, q.position + sf::Vector2i (0, -1)});
+            if (!mMap->getTileAt (right.position)->collidable)
+                list.push_back (right);
+
+            if (!mMap->getTileAt (left.position)->collidable)
+                list.push_back (left);
+
+            if (!mMap->getTileAt (up.position)->collidable)
+                list.push_back (up);
+
+            if (!mMap->getTileAt (down.position)->collidable)
+                list.push_back (down);
 
             return list;
         }
-        int distance (sf::Vector2i position1, sf::Vector2i position2) {
+        float distance (sf::Vector2i position1, sf::Vector2i position2) {
             int x_dist = position1.x - position2.x;
             int y_dist = position1.y - position2.y;
-            return (x_dist * x_dist) + (y_dist * y_dist);
+            return std::sqrt ((x_dist * x_dist) + (y_dist * y_dist));
         }
-        int manhattanDistance (sf::Vector2i position1, sf::Vector2i position2) {
+        float manhattanDistance (sf::Vector2i position1, sf::Vector2i position2) {
             return std::abs (position1.x - position2.x) + std::abs (position1.y - position2.y);
         }
 
@@ -160,7 +221,7 @@ class A_Star {
                 if (current.position != node.position)
                     continue;
                 
-                if (current.f < node.f)
+                if (current.g < node.g)
                     return true;
             }
             return false;

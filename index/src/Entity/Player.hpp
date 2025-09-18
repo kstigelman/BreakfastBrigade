@@ -82,7 +82,7 @@ class Player : public Entity
 				sf::IntRect textureRect = sf::IntRect(16 * (id - 1), 0, 16, 20);
 				sprite.setTextureRect(textureRect);
 				sprite.setTexture(texture);
-				sprite.setPosition(180, 240);
+				setPosition (sf::Vector2f (180, 240));
 				sprite.setOrigin (sf::Vector2f(textureRect.width / 2, textureRect.height / 2));
 			}
 			else {

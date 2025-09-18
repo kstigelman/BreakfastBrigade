@@ -54,7 +54,8 @@ class ColiforB : public Level {
             player->setController (getController ());
             
 
-            registerObject (new Broccoli (this, player));
+            registerObject (new Broccoli (this, player), sf::Vector2f (180, 150));
+
             //enemy = new Broccoli (1, 50.f);
             //enemy2 = new Broccoli ();
 
@@ -103,6 +104,9 @@ class ColiforB : public Level {
             textboxes.clear ();
             //entities.clear ();
         }
+        Collider& getShip () {
+            return ship.getCollider ();
+        }
         void update (float dt) override {
             for (TextBox* tb : textboxes)
                 tb->update (dt);
@@ -148,7 +152,10 @@ class ColiforB : public Level {
                     // Check tilemap collision
                     if (!tilemap->isCoordinateOutsideOfMap (e->getPosition ())) {
                         if (tilemap->isTargetBlocked (e->getCollider ())) {
-                            e->getCollider ().setBlocked (true);
+                            //e->getCollider ().setBlocked (true);
+                        }
+                        else {
+                            //e->getCollider ().setBlocked (false);
                         }
                     }
                     // Check for friends
@@ -377,7 +384,7 @@ class ColiforB : public Level {
         }
         bool
         checkSpawnLocation (int x, int y) {
-            if (!map.getTileMap()->getAtCoordinate (x, y)->collidable)
+            if (!map.getTileMap()->getTileAtCoordinate (x, y)->collidable)
                 return true;
             
             return false;

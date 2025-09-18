@@ -78,6 +78,10 @@ public:
     virtual void registerObject (GameObject* object) {
         objectCollection.push_back (object);
     }
+    virtual void registerObject (GameObject* object, sf::Vector2f position) {
+        objectCollection.push_back (object);
+        object->setPosition (position);
+    }
     virtual void registerProjectile (class Projectile* p) {
         
     };
