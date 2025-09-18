@@ -38,7 +38,7 @@ class TextBox {
 				text.setString (textString);
 			else
 				text.setString ("Placeholder text");
-			text.setColor (color);
+			text.setFillColor (color);
 			text.setFont (font);
 			text.setCharacterSize (size);
 
@@ -83,7 +83,7 @@ class TextBox {
 			window.draw (text);
 		}
 		void setColor (sf::Color color) {
-			text.setColor (color);
+			text.setFillColor (color);
 		}
 		
 

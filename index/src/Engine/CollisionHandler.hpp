@@ -19,7 +19,7 @@ class CollisionHandler {
                     if (i == j)
                         continue;
                     if (entityColliders[i]->intersects (*entityColliders[j])) {
-                        entityColliders[i]
+                        // entityColliders[i]
                     }
                 }
             }

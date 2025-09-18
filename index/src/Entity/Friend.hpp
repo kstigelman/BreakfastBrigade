@@ -1,12 +1,18 @@
 #pragma once
+#include <math.h>
+
 #include "Entity.hpp"
+#include "PathfinderComponent.hpp"
 
 class Friend : public Entity {
     private:
         bool bFound = false;
         Entity* target;
+
+        Collider searchCollider;
+        PathfinderComponent pathfinder;
     public:
-        Friend () {
+        Friend (Level* scene) : Entity (scene), searchCollider (sf::RectangleShape (sf::Vector2f (70, 70))), pathfinder (scene, &getCollider (), &getCollider ()) {
             tag = "Friend";
         }
         ~Friend () {
@@ -23,23 +29,36 @@ class Friend : public Entity {
 		{
 			if (isActive())
 			{
-				pathfinding (dt);
+				//pathfinding (dt);
 				Entity::update (dt);
-				move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
-				if (velocity != sf::Vector2f (0, 0))
-					animator.nextFrame ();
+
+                if (!bFound) {
+                    if (target != nullptr) {
+                        if (searchCollider.isColliding (target->getCollider ())) {
+                            // Add this friend to the ship
+                            setFound (true);
+                            
+                        }
+                    }
+                }
+                else {
+                    pathfinder.update (dt);
+                    move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
+
+                    if (velocity != sf::Vector2f (0, 0))
+                        animator.nextFrame ();
 				
-				if (target != nullptr) {
-					if (collider.isColliding (target->getCollider ())) {
-						// Add this friend to the ship
-					}
-				}
+                }
             }
         }
         bool isFound () {
             return bFound;
         }
-        bool setFound (bool newVal) {
+        virtual void setPosition(sf::Vector2f position) override {
+			Entity::setPosition (position);
+            searchCollider.setPosition (getPosition ());
+		}
+        void setFound (bool newVal) {
             bFound = newVal;
         }
         Entity* getTarget () {

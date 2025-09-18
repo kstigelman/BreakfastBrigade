@@ -55,6 +55,20 @@ class Collider {
 		clear () {
 			mask = 0;
 		}
+		std::vector<sf::Vector2f> getFourCorners () {
+			float width = hitbox.getGlobalBounds().width;
+			float height = hitbox.getGlobalBounds().height;
+			float left = hitbox.getGlobalBounds().left;
+			float top = hitbox.getGlobalBounds().top;
+
+			std::vector<sf::Vector2f> corners;
+			corners.push_back (sf::Vector2f (left, top));
+			corners.push_back (sf::Vector2f (left + width, top));
+			corners.push_back (sf::Vector2f (left + width, top + height));
+			corners.push_back (sf::Vector2f (left, top + height));
+			
+			return corners;
+		} 
 
 		void 
 		setHitbox (sf::RectangleShape newHb) {

@@ -9,10 +9,10 @@ class Broccoli : public Enemy
 	protected:
 	
 	public:
-		Broccoli(Level* world, Entity* entityTarget, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
+		Broccoli(Level* world, Entity* entityTarget = nullptr, float difficulty = 0.f) : Enemy (world, entityTarget, difficulty)
 		{
 			//setName ("Broccoli" + std::to_string (id));
-			setPosition(getPosition());
+			setPosition(sf::Vector2f(300, 180));
 			movementSpeed = 10.f;
 			
 			//animator = new Animator (&texture, &sprite, 2, 2);
@@ -26,15 +26,19 @@ class Broccoli : public Enemy
 			
 
 			sprite.setScale(2.f + (difficulty / 50.f), 2.f + (difficulty / 50.f));
-			collider.setHitbox (sf::RectangleShape (sf::Vector2f (
+			/*collider.setHitbox (sf::RectangleShape (sf::Vector2f (
 				sprite.getScale().x * collider.getHitbox ().getSize().x,
 				sprite.getScale().y * collider.getHitbox ().getSize().y
-			)));
+			)));*/
+			collider.setHitbox (sf::RectangleShape (sf::Vector2f (16, 16)));
 			//sprite.setOrigin(animator->getFrameDim().x / 2, animator->getFrameDim().y/ 2);
 		}
 		~Broccoli()
 		{
 			
+		}
+		virtual void attack () override {
+
 		}
 	
 	

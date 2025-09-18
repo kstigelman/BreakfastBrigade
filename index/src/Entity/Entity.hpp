@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <math.h>
 #include <SFML/Graphics.hpp>
 #include "../Engine/Collider.hpp"
 #include "../UI/HealthBar.hpp"
@@ -39,6 +40,7 @@ class Entity : public GameObject
 		double health = BASE_HEALTH;
 
 		bool drawHitbox = false;
+
 	protected:
 
 		bool dead;
@@ -98,7 +100,7 @@ class Entity : public GameObject
 
 		}
 		virtual void spawn (Scene* scene) {
-			level->registerObject (this);
+			scene->registerObject (this);
 		}
 		virtual void init ()
 		{
@@ -119,8 +121,10 @@ class Entity : public GameObject
 		}
 		virtual void update (float dt) {
 			sf::Vector2f prevPosition = getPosition();
+
 			move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
 
+			// Check ColiforB.hpp update and Collider.hpp isBlocked method.
 			if (collider.isBlocked())
 				setPosition (prevPosition);
 		}
@@ -132,23 +136,34 @@ class Entity : public GameObject
 		sf::Vector2f getPosition() const {
 			return sprite.getPosition();
 		}
-		void setPosition(sf::Vector2f position) {
+		virtual void setPosition(sf::Vector2f position) {
 			transform.position = position;
 			sprite.setPosition(position);
 			setColliderPosition (sprite.getPosition ());
 		}
 		sf::Vector2f getVelocity () {
-			return velocity;
+			return velocity; 
 		}
 		sf::FloatRect getBounds() {
 			return sprite.getGlobalBounds();
 		}
 		virtual void move(sf::Vector2f velocity) {
+			if (collider.isBlocked ())
+				return;
 			transform.position += velocity;
 			sprite.move(velocity);
 			setColliderPosition (sprite.getPosition ());
 		}
+		void normalizeVelocityToPosition (sf::Vector2f targetPosition) {
+			float magnitude = std::sqrt (std::pow ((targetPosition.x - sprite.getPosition().x), 2) + std::pow ((targetPosition.y - sprite.getPosition().y), 2));
 
+			float dx = (targetPosition.x - sprite.getPosition().x) / magnitude;
+			float dy = (targetPosition.y - sprite.getPosition().y) / magnitude;
+				
+			//float a = std::atan2(dy, dx);
+			
+			velocity = sf::Vector2f(dx * getMovementSpeed (), dy * getMovementSpeed ());
+		}
 		Collider& getCollider () {
 			return collider;
 		}

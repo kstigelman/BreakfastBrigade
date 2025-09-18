@@ -2,11 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
+#include <set>
 #include "Transform.hpp"
 
 class GameObject{
     private:
-        std::vector<std::string> tags;
+        std::set<std::string> tags;
 
     protected:
         bool bDraw;
@@ -27,8 +28,8 @@ class GameObject{
         void setPosition (sf::Vector2f pos) {
             transform.position = pos;
         }
-        Transform& getTransform () {
-            return transform;
+        Transform* getTransform () {
+            return &transform;
         }
         bool canDraw () {
             return bDraw;
@@ -43,9 +44,9 @@ class GameObject{
             bDraw = newVal;
         }
         void addTag (std::string newTag) {
-            tags.push_back (newTag);
+            tags.insert(newTag);
         }
-        std::vector<std::string>& getTags () const {
+        std::set<std::string> getTags () const {
             return tags;
         }
 };

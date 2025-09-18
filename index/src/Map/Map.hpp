@@ -14,6 +14,7 @@ class Map
 	public:
 		Map(sf::Vector2f size = sf::Vector2f (64, 64)) : tilemap (size.x, size.y)
 		{
+			printf ("Map: Constructor");
 			background.setSize(sf::Vector2f(size.x, size.x));
 			background.setPosition(0, size.y - size.x);
 			background.setFillColor(sf::Color(210, 190, 165));
@@ -31,6 +32,9 @@ class Map
 		}
 		TileMap* getTileMap () {
 			return &tilemap;
+		}
+		bool isBlockedAt (float x, float y) {
+			return tilemap.getTileAtCoordinate ((int) x / 32, (int) y / 32)->collidable;
 		}
 		void loadWalls () {
 			sf::Vertex* quad = &walls[0];

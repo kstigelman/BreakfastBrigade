@@ -10,6 +10,8 @@ class Shot
 		int direction;
 		int movementSpeed;
 		sf::CircleShape bullet;
+
+		std::set<std::string> collidesWith;
 	public:
 		Shot(sf::Vector2f position, int m_direction)
 		{

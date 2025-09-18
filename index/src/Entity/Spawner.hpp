@@ -1,16 +1,17 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <fstream>
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 
 #include "../Engine/GameObject.hpp"
 
 
 
-using json = nlohmann::json;
+//using json = nlohmann::json;
 
 class Spawner {
     private:
+        
         unsigned difficulty = 0;
     public:
         Spawner () {}
@@ -26,10 +27,11 @@ class Spawner {
 template <class T>
 class SpawnerFor : public Spawner {
     public:
+
         virtual T* spawn(Level* level, sf::Vector2f position) { 
-            entity_ = new T(level);
-            entity_->setPosition (position);
-            level->registerObject (entity_);
-            return entity_;
+            T* object = new T(level);
+            object->setPosition (position);
+            level->registerObject (object);
+            return object;
         }
 };

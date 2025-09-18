@@ -21,7 +21,7 @@ class HUD
 			
 
 			text.setFont (font);
-			text.setColor (sf::Color::White);	
+			text.setFillColor (sf::Color::White);	
 			text.setCharacterSize (24);
 			text.setString ("");
 			text.setPosition (sf::Vector2f (getHudPosition ().x + 100, getHudPosition ().y - 40));
