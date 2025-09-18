@@ -1,3 +1,8 @@
+# The Breakfast Brigade
+After the S.S Frying Pan crash lands on the planet Colifor-B,
+the Breakfast Brigade must find a way home while surviving the 
+monsters that lurk in the forest...
+
 # CMake SFML Project Template
 
 This repository template should allow for a fast and hassle-free kick start of your next SFML project using CMake.
