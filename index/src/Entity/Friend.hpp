@@ -7,6 +7,7 @@
 class Friend : public Entity {
     private:
         bool bFound = false;
+        bool addedToShip = false;
         Entity* target;
 
         Collider searchCollider;
@@ -32,22 +33,42 @@ class Friend : public Entity {
 				//pathfinding (dt);
 				Entity::update (dt);
 
+
+                // Target is the player when not found
                 if (!bFound) {
                     if (target != nullptr) {
                         if (searchCollider.isColliding (target->getCollider ())) {
                             // Add this friend to the ship
                             setFound (true);
+                            std::vector<Entity*> entities = m_world->getEntitiesByName ("ship");
                             
+                            if (entities.size () > 0)
+                                target = entities[0];
+                            else
+                                target = nullptr;
                         }
                     }
                 }
+                // Target is the ship when found
                 else {
+
+
                     pathfinder.update (dt);
                     move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
 
                     if (velocity != sf::Vector2f (0, 0))
                         animator.nextFrame ();
-				
+                    
+                    if (addedToShip) 
+                        return;
+
+                    if (searchCollider.isColliding (target->getCollider ())) {
+                        Ship* s = dynamic_cast <Ship*> (target);
+                        if (s) {
+                            s->addFriend (this);
+                            addedToShip = true;
+                        } 
+                    }
                 }
             }
         }
