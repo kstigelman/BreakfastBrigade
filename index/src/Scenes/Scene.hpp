@@ -102,7 +102,14 @@ public:
         return controller;
     }
 
-
+    std::vector<GameObject*> getObjectsByTag (std::string tag) {
+        std::vector<GameObject*> objsList;
+        for (GameObject* obj : objectCollection) {
+            if (obj->getTags().count (tag) > 0)
+                objsList.push_back (obj);
+        } 
+        return objsList;
+    }
 
     std::string getName () {
         return sceneName;

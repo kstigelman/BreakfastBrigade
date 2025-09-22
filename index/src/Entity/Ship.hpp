@@ -4,6 +4,8 @@
 #include "Entity.hpp"
 #include "../UI/Animator.hpp"
 
+class Friend;
+
 class Ship : public Entity {
     private:
         sf::Texture m_texture;
@@ -19,6 +21,7 @@ class Ship : public Entity {
         Collider interactZone;
 
         HealthBar healthbar;
+        std::vector<Friend*> foundFriends;
     public:
         Ship (Level* world) : Entity (world, sf::RectangleShape (sf::Vector2f (30, 15))) {
             texture.loadFromFile ("resources/sprites/destroyed_ship.png");
@@ -31,6 +34,8 @@ class Ship : public Entity {
             healthbar = HealthBar (100, sf::Vector2f (60, 6));
 
             interactZone = Collider (100, 100);
+            name = "ship";
+            addTag ("ship");
         }
 
         void setDestroyed (bool newVal) {
@@ -77,5 +82,8 @@ class Ship : public Entity {
         }
         Collider getInteractionZone () {
             return interactZone;
+        }
+        void addFriend (Friend* f) {
+            foundFriends.push_back (f);
         }
 };
