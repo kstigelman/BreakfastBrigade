@@ -18,7 +18,19 @@ class Ship : public Entity {
         float basePos = 360;
 
         bool destroyed = true;
+        bool bMainMenu = true;
+        bool bTakeoff = false;
+
+        float timeToFullyCharge = 30.0;
+        sf::Clock chargeTimer;
+
+        float repairAmount = 0.0;
+        float timeToRepair = 180.0;
+
+
         Collider interactZone;
+
+        int maxFoundFriends = 4;
 
         HealthBar healthbar;
         std::vector<Friend*> foundFriends;
@@ -61,17 +73,39 @@ class Ship : public Entity {
         }
         virtual void update (float dt) {
             Entity::update (dt);
-            //collider.setPosition (m_sprite.getPosition());
-            healthbar.setPosition (sprite.getPosition() + sf::Vector2f (0, -30));
 
-            if (!destroyed) {
+            if (bMainMenu) {
                 animator.nextFrame ();
                 elapsedTime += dt;
                 sprite.setPosition (360, basePos + (15 * std::sin (elapsedTime * 3.6 / 3.14)));
+                return;
             }
+
+            //collider.setPosition (m_sprite.getPosition());
+            healthbar.setPosition (sprite.getPosition() + sf::Vector2f (0, -30));
+
             if (destroyed) {
                 animator.nextFrame ();
+
+                repairAmount += dt * foundFriends.size ();
+
+                if (foundFriends.size () == maxFoundFriends) {
+                    setDestroyed (false);
+                    bTakeoff = true;
+                }
             }
+        }
+        bool foundAllFriends () {
+            return foundFriends.size() == maxFoundFriends;
+        }
+        void setMainMenu (bool bNewVal) {
+            bMainMenu = bNewVal;
+        }
+        bool isMainMenu () {
+            return bMainMenu;
+        }
+        bool isReadyForTakeoff () {
+            return bTakeoff;
         }
         virtual void damage (sf::Vector2f source, int amount) {
             healthbar.takeDamage (amount);

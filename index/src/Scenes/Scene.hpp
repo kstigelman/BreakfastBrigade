@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <set>
+#include <vector>
+#include <functional>
 
 #include "../UI/UIElement.hpp"
 #include "../UI/UIRegistry.hpp"
@@ -23,8 +25,11 @@ private:
     GameSettings* gameSettings;
     bool bTick = false;
 
+
+
 protected:
     bool exitScene = false;
+    std::vector<std::function<void()>> deferredFunctions;
 public:
     Scene (GameSettings* gameSettings) : gameSettings(gameSettings), uiRegistry (gameSettings) {
         printf ("Scene: Constructor");
@@ -122,6 +127,15 @@ public:
 
     void addElement (UIElement* e) {
         uiRegistry.add (e);
+    }
+
+    void addInputFunction (std::function<void()> newFunc) {
+        deferredFunctions.push_back (newFunc);
+    }
+    void runInputFunctions () {
+        for (std::function<void()> f : deferredFunctions) {
+            f();
+        }
     }
 
 };

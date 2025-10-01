@@ -3,8 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include "Collision.hpp"
 
-class Entity;
-
 class Collider {
 	private:
 		std::vector<Collision> collisions;
@@ -14,7 +12,6 @@ class Collider {
 		bool bBlocked = false;
 		short mask = 0;
 
-		Entity* mParent;
 	public:
 		bool shouldDraw = false;
 		Collider (sf::RectangleShape hb = sf::RectangleShape ()) {
@@ -37,12 +34,7 @@ class Collider {
 		isBlocking () {
 			return bBlocking;
 		}
-		Entity* getParent () {
-			return mParent;
-		}
-		void setParent (Entity* e) {
-			mParent = e;
-		}
+
 		void
 		setBlocking (bool bNewBlocking) {
 			bBlocking = bNewBlocking;

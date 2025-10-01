@@ -20,6 +20,10 @@ class ColiforB : public Level {
         TileMap* tilemap;
 
         Player* player;
+
+        sf::View camera;
+        Entity* cameraTarget;
+
         Ship ship = Ship (this);
         //Broccoli* enemy;
         //Broccoli* enemy2;
@@ -30,6 +34,8 @@ class ColiforB : public Level {
         bool toggleKeys = false;
         bool toggle = false;
         bool gameOver = false;
+
+        bool initiateLaunch = false;
 
         sf::Clock spawnTimer;
         float spawnInterval = 0.05;
@@ -53,6 +59,7 @@ class ColiforB : public Level {
             
             player->setController (getController ());
             
+            setCameraTarget (player);
 
             registerObject (new Broccoli (this, player), sf::Vector2f (180, 150));
 
@@ -160,11 +167,17 @@ class ColiforB : public Level {
                     }
                     // Check for friends
                     if (e->getTags ().count ("Friend")) {
-                        Friend* f = (Friend*) e;
+                        Friend* f = dynamic_cast<Friend*> (e);
 
                         if (!f->isFound ()) {
                             if (player->getBounds().intersects (f->getBounds ())) {
                                 f->setTarget (&ship);
+                            }
+                        }
+                        else if (!f->isAddedToShip ()) {
+                            if (ship.getBounds ().intersects (f->getBounds ())) {
+                                f->setAddedToShip (true);
+                                ship.addFriend (f);
                             }
                         }
                     }
@@ -190,6 +203,15 @@ class ColiforB : public Level {
                         }
                     }
                     
+                    if (ship.isReadyForTakeoff ()) {
+                        if (ship.getCollider ().intersects (player->getCollider ())) {
+                            addInputFunction ([this](){
+                                if (sf::Keyboard::isKeyPressed (sf::Keyboard::E)) {
+                                    this->initiateLaunch = true;
+                                }
+                            });
+                        }
+                    }
                 }
                 /*if (player->getInputs ().find (6) != player->getInputs ().end()) {
                     if (ship.getInteractionZone().isColliding (player->getCollider ())) {
@@ -345,6 +367,9 @@ class ColiforB : public Level {
         void addSpawner (Spawner* spawner, unsigned weight) {
             spawners.push_back(std::pair(spawner, weight));
         }
+        void setCameraTarget (Entity* e) {
+            cameraTarget = e;
+        }
         void draw (sf::RenderWindow& window) override {
                         //room.draw (window);
             //player.draw (window);
@@ -371,6 +396,7 @@ class ColiforB : public Level {
             window.setView (player->getCamera ());
         }
         void eventHandler (sf::Event& e) override {
+            runInputFunctions ();
             getRegistry()->eventHandler (e);
         }
 

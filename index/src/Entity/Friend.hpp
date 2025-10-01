@@ -2,12 +2,15 @@
 #include <math.h>
 
 #include "Entity.hpp"
+#include "Ship.hpp"
 #include "PathfinderComponent.hpp"
+
+class Ship;
 
 class Friend : public Entity {
     private:
         bool bFound = false;
-        bool addedToShip = false;
+        bool bAddedToShip = false;
         Entity* target;
 
         Collider searchCollider;
@@ -40,10 +43,10 @@ class Friend : public Entity {
                         if (searchCollider.isColliding (target->getCollider ())) {
                             // Add this friend to the ship
                             setFound (true);
-                            std::vector<Entity*> entities = m_world->getEntitiesByName ("ship");
+                            std::vector<GameObject*> entities = m_world->getEntitiesByTag ("ship");
                             
                             if (entities.size () > 0)
-                                target = entities[0];
+                                target = dynamic_cast<Entity*>(entities[0]);
                             else
                                 target = nullptr;
                         }
@@ -54,21 +57,14 @@ class Friend : public Entity {
 
 
                     pathfinder.update (dt);
+                    normalizeVelocityToPosition (pathfinder.getNextPosition ());
+				
                     move (sf::Vector2f (velocity.x * dt, velocity.y * dt));
 
                     if (velocity != sf::Vector2f (0, 0))
                         animator.nextFrame ();
                     
-                    if (addedToShip) 
-                        return;
 
-                    if (searchCollider.isColliding (target->getCollider ())) {
-                        Ship* s = dynamic_cast <Ship*> (target);
-                        if (s) {
-                            s->addFriend (this);
-                            addedToShip = true;
-                        } 
-                    }
                 }
             }
         }
@@ -81,6 +77,12 @@ class Friend : public Entity {
 		}
         void setFound (bool newVal) {
             bFound = newVal;
+        }
+        bool isAddedToShip () {
+            return bAddedToShip;
+        }
+        void setAddedToShip (bool bNewVal) {
+            bAddedToShip = bNewVal;
         }
         Entity* getTarget () {
             return target;

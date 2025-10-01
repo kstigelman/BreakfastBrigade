@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.hpp"
 #include "../Map/Map.hpp"
+
+
+
 class Level : public Scene {
     protected:
         Map map;
@@ -12,18 +15,17 @@ class Level : public Scene {
         Map* getMap () {
             return &map;
         }
-        std::vector<Entity*> getEntitiesByTag (std::string tag) {
-            std::vector<Entity*> entityList;
+        std::vector<GameObject*> getEntitiesByTag (std::string tag) {
+            std::vector<GameObject*> entityList;
             
             for (GameObject* obj : getGameObjects ()) {
 
-                Entity* e = dynamic_cast<Entity*> (obj);
-                if (e && e->getTags ().count (tag) > 0)
-                    entityList.push_back (e);
+                if (obj && obj->getTags ().count (tag) > 0)
+                    entityList.push_back (obj);
             }
             return entityList;
         }
-        std::vector<Entity*> getEntitiesByName (std::string name) {
+        /*std::vector<Entity*> getEntitiesByName (std::string name) {
             std::vector<Entity*> entityList;
             
             for (GameObject* obj : getGameObjects ()) {
@@ -33,5 +35,5 @@ class Level : public Scene {
                     entityList.push_back (e);
             }
             return entityList;
-        }
+        }*/
 };
