@@ -7,6 +7,9 @@ struct GameSettings {
     unsigned HEIGHT = 720;
 
     sf::Vector2i mouseCoords = sf::Vector2i (0.0, 0.0);
+    sf::RenderWindow* currentWindow;
     class Scene* currentScene;
     bool bLeftClicked = false;
+
+    bool bReadyForExit = false;
 };

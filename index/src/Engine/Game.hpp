@@ -33,7 +33,7 @@ class Game
 		int state = 0;
 
 		bool quit = false;
-
+		bool bMainMenuActive = true;
 		sf::Music musicPlayer;
 	public:
 
@@ -42,6 +42,8 @@ class Game
 			window.create(sf::VideoMode(settings.WIDTH, settings.HEIGHT), title);
 			musicManager ();
 
+			settings.currentWindow = &window;
+			
 			if (!state) {
 				settings.currentScene = new MainMenu (&settings);
 			}
@@ -56,6 +58,7 @@ class Game
 				delete settings.currentScene;
 				settings.currentScene = nullptr;
 			}
+			printf ("Safely exiting the game");
 		}
 		void setScene (Scene* newScene) {
 			Scene* oldScene = settings.currentScene;
@@ -93,7 +96,8 @@ class Game
 						settings.currentScene->eventHandler(event);
 
 					if (event.type == sf::Event::Closed)
-						window.close ();
+						closeApplication ();
+
 
 					if (event.type == sf::Event::Resized)
 						windowRescaleEvent ();
@@ -152,12 +156,12 @@ class Game
 
 			while(window.isOpen())
 			{	
+				if (settings.bReadyForExit) {
+					closeApplication ();
+				}
+
 				eventManager ();
 				update();
-				
-				if (quit == true)
-					return;
-
 				draw();
 				
 				/*if (state == 0) {
@@ -201,12 +205,17 @@ class Game
 					return;
 				std::string info = settings.currentScene->getExitInfo();
 
+
 				if (info == "Exit") {
+					settings.bReadyForExit = true;
 					quit = true;
 				}
-				else {
+				else if (info == "Play") {
 					setScene (new ColiforB (&settings, "Bacon"));
 					state += 1;
+				}
+				else if (info == "QuitToTitle") {
+					setScene (new MainMenu (&settings));
 				}
 					
 			}	
@@ -231,4 +240,7 @@ class Game
 				}****
 			}*/
 		}	
+		void closeApplication () {
+			window.close ();
+		}
 };

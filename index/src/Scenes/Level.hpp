@@ -2,15 +2,20 @@
 #include <SFML/Graphics.hpp>
 #include "Scene.hpp"
 #include "../Map/Map.hpp"
-
+#include "../Entity/Projectile.hpp"
 
 
 class Level : public Scene {
     protected:
         Map map;
+
+        std::vector<Projectile*> projectileCollection;
     public:
         Level (GameSettings* gameSettings) : Scene (gameSettings) {
             printf ("Level: Constructor");
+        }
+        ~Level () {
+            clearProjectiles ();
         }
         Map* getMap () {
             return &map;
@@ -24,6 +29,16 @@ class Level : public Scene {
                     entityList.push_back (obj);
             }
             return entityList;
+        }
+        void registerProjectile (Projectile* p) override {
+            projectileCollection.push_back (p);
+        }
+
+        void clearProjectiles () {
+            for (Projectile* p : projectileCollection)
+                if (p != nullptr)
+                    delete p;
+            projectileCollection.clear ();
         }
         /*std::vector<Entity*> getEntitiesByName (std::string name) {
             std::vector<Entity*> entityList;

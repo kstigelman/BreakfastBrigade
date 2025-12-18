@@ -177,7 +177,9 @@ public:
                     }
                     else if (identifier == "Start") {
                         // We are replacing the entire scene
+                        setExitInfo ("Play");
                         exitScene = true;
+
                         std::string selection = currentScreen->getAdditionalInfo ();
                         getRegistry()->clear();
                         if (selection == "Bacon Buddy") {

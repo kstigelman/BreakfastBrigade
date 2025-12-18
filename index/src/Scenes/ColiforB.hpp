@@ -11,6 +11,9 @@
 #include "../Engine/GameState.hpp" 
 #include "../Engine/GameFunctions.hpp"
 #include "../Entity/Spawner.hpp"
+#include "../Entity/Projectile.hpp"
+#include "Screens/Screen.hpp"
+
 
 class ColiforB : public Level {
     private:
@@ -38,7 +41,7 @@ class ColiforB : public Level {
         bool initiateLaunch = false;
 
         sf::Clock spawnTimer;
-        float spawnInterval = 0.05;
+        float spawnInterval = 0.5;
 
         sf::Clock difficultyTimer;
 
@@ -46,6 +49,7 @@ class ColiforB : public Level {
 
         std::vector<TextBox*> textboxes;
 
+        Screen* currentScreen = nullptr;
         //SpawnerFor<Projectile*> projectiles;
         std::vector<std::tuple<Spawner*, int>> spawners;
     public:
@@ -104,7 +108,6 @@ class ColiforB : public Level {
                 delete s;
                 s = nullptr;
             }*/
-
             for (TextBox* tb : textboxes)
                 if (tb != nullptr)
                     delete tb;
@@ -114,7 +117,24 @@ class ColiforB : public Level {
         Collider& getShip () {
             return ship.getCollider ();
         }
+        void replaceScreen (Screen* newScreen) {    
+            Screen* oldScreen = currentScreen;
+            currentScreen = newScreen;
+            delete oldScreen;
+            oldScreen = nullptr;
+        }
+
         void update (float dt) override {
+            if (currentScreen) {
+                currentScreen->update (dt);
+                if (currentScreen->screenIsFinished ()) {
+                    if (currentScreen->getExitIdentifier() == "Quit") {
+                        setExitInfo ("QuitToTitle");
+                        setReadyForExitScene (true);
+                    }
+                }
+                return;
+            }
             for (TextBox* tb : textboxes)
                 tb->update (dt);
 
@@ -125,6 +145,9 @@ class ColiforB : public Level {
 
                 //updateSpawners ();
                 //updateDifficulty ();
+                if (spawnTimer.getElapsedTime().asSeconds () > spawnInterval) {
+                    spawnEnemies ();
+                }
                 
                 if (sf::Keyboard::isKeyPressed (sf::Keyboard::C)) {
                     if (!toggleKeys) {
@@ -146,8 +169,15 @@ class ColiforB : public Level {
                 /*for (Projectile* p : projectiles) {
                     p->update (dt);
                 }*/
+                for (Projectile* p : projectileCollection) {
+                    if (p == nullptr)
+                        continue;
+                    p->update (dt);
+                }
+
 
                 auto entities = getGameObjects ();
+
                 
                 for (int i = entities.size() - 1; i >= 0; --i) {
                     Entity* e = (Entity*) entities[i];
@@ -186,19 +216,22 @@ class ColiforB : public Level {
                         if (player->getBounds().intersects (e->getBounds ()))
                             player->damage (e->getVelocity (), 1);
                 
-                        for (int i = 0; i < player->bullets.size (); i++)
+                        for (size_t j = projectileCollection.size () - 1; j >= 0; --i)
                         {
-                            if (player->bullets[i].isColliding (e)) {
-                                e->damage (player->getPosition (), 1);
-                                player->bullets.erase (player->bullets.begin () + i);
+                            Projectile* projectile = projectileCollection[j];
 
-                                if (e->isDead ()) {
-                                    e->setActive (false);
-                                    //delete e;
-                                    //e = nullptr;
-                                    //entities.erase(entities.begin () + i);
-                                }
-                            }
+                            if (projectile->isColliding (e))
+                                projectile->onCollision (e);
+
+                            // Eventually we can make this more efficient by swapping i with end
+                            // This is currently commented out because we need to make sure these objects are deleted before they are erased
+                            /*if (!projectile->isActive ())
+                                projectileCollection.erase (projectileCollection.begin () + j);
+
+                            if (!e->isActive ()) {
+                                entities.erase (entities.begin () + i);
+                                break;
+                            }*/
 
                         }
                     }
@@ -230,9 +263,8 @@ class ColiforB : public Level {
             }
             cleanupAllContainers ();
         }
-        void registerProjectile (Projectile* p) {
-            //projectiles->push_back (p);
-        }
+
+    
         virtual void setController (std::set<sf::Keyboard::Key>* newController) {
             Scene::setController (newController);
             player->setController (newController);
@@ -378,7 +410,6 @@ class ColiforB : public Level {
             
             ship.draw (window);
 
-            
             player->draw (window);
 
             //enemy->draw (window);
@@ -388,12 +419,24 @@ class ColiforB : public Level {
                 if (e != nullptr && e->canDraw())
                     e->draw (window);
             }
+            for (Projectile* p : projectileCollection) {
+                if (p != nullptr && p->canDraw ())
+                    p->draw (window);
+            }
+
+            // Eventually, make a Camera class, and have ALL drawing controlled here. World, Entites are drawn first,
+            // THEN all dispaly/HUD/GUI is drawn at the end
+            window.setView (player->getHealthbar ()->getHud ());
+            player->getHealthbar ()->draw (window);
+
             for (TextBox* tb : textboxes) {
                 if (tb != nullptr && tb->isActive ())
                     tb->draw (window);
             }
 
             window.setView (player->getCamera ());
+            if (currentScreen)
+                currentScreen->draw (window);
         }
         void eventHandler (sf::Event& e) override {
             runInputFunctions ();
@@ -421,8 +464,8 @@ class ColiforB : public Level {
         spawnEnemies () {
             int magnitude = 100;
             int distance = 500;
-            sf::Vector2i vec = sf::Vector2i (getRandom() % magnitude, getRandom() % magnitude);
-            sf::Vector2f normalized = sf::Vector2f (vec.x / magnitude, vec.y / magnitude);
+            sf::Vector2f vec = sf::Vector2f ((float) (getRandom() % magnitude), (float) (getRandom() % magnitude));
+            sf::Vector2f normalized = sf::Vector2f ( vec.x / ((float) magnitude), vec.y / ((float) magnitude));
 
             float scale = distance / vec.y;
 
@@ -438,11 +481,14 @@ class ColiforB : public Level {
                     return;
                 }
             }
-            selectEntity(sf::Vector2f(player->getPosition().x + normalized.x, player->getPosition().y + normalized.y));
+            registerObject (new Broccoli (this, player), sf::Vector2f(player->getPosition().x + normalized.x, 
+                                                                      player->getPosition().y + normalized.y));
+            //selectEntity(sf::Vector2f(player->getPosition().x + normalized.x, player->getPosition().y + normalized.y));
             // Select enemy, add to world at normalized location.
         }   
         Entity* selectEntity (sf::Vector2f position) {
-            unsigned random = getRandom () % 1000;
+            
+            /*unsigned random = getRandom () % 1000;
             unsigned sum = 0;
 
             for (auto p : spawners) {
@@ -457,6 +503,7 @@ class ColiforB : public Level {
                     break;
                 }       
             }
+            */
             return nullptr;
         }
 };

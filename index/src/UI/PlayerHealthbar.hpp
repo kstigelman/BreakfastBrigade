@@ -89,6 +89,9 @@ class PlayerHealthbar : public HealthBar
 			}*/
 			
 		}
+		sf::View& getHud () {
+			return hud;
+		}
 		void SetFull () {
 			HealthBar::setHealth (HealthBar::getMaxHealth ());
 			for (size_t i = 0; i < hearts.size (); ++i)

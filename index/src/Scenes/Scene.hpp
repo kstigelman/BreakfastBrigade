@@ -61,6 +61,8 @@ public:
     }
     virtual void eventHandler (sf::Event& e) = 0;
 
+
+
     void spawn(GameObject* entity_, sf::Vector2f position) { 
         objectCollection.push_back (entity_);
         entity_->setPosition (position);
@@ -100,6 +102,9 @@ public:
     bool readyForExit () {
         return exitScene;
     }
+    void setReadyForExitScene (bool newExitValue) {
+        exitScene = newExitValue;
+    }
     virtual void setController (std::set<sf::Keyboard::Key>* newController) {
         controller = newController;
     }
@@ -136,6 +141,9 @@ public:
         for (std::function<void()> f : deferredFunctions) {
             f();
         }
+    }
+    GameSettings* getGameSettings () {
+        return gameSettings;
     }
 
 };

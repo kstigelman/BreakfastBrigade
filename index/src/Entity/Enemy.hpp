@@ -65,7 +65,7 @@ class Enemy : public Entity
 				//animator.nextFrame();
 				window.draw(sprite);
 				collider.draw (window);
-				//healthBar.draw(window);
+				healthBar.draw(window);
 			}
 		}
 		virtual void attack () = 0;

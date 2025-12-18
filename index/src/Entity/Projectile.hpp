@@ -17,14 +17,17 @@ class Projectile : public GameObject {
 
         std::string ownerTag;
     public:
-        Projectile(Level* level, sf::Vector2f velocity, float damage = 1.0, float lifetime = 5.0) 
-        : damage(damage), velocity(velocity), lifetime(lifetime) {
+        Projectile(Level* level, sf::Vector2f velocity, std::string ownerTag = "", float damage = 1.0, float lifetime = 5.0) 
+        : damage(damage), velocity(velocity), ownerTag(ownerTag), lifetime(lifetime) {
         }
         ~Projectile(){}
 
 		virtual void spawn (Scene* scene) {
-			scene->registerObject (this);
+			scene->registerProjectile (this);
 		}
+        std::string getOwnerTag () const {
+            return ownerTag;
+        }
         void update (float dt) {
             if (active) {
                 lifetime -= dt;
@@ -63,5 +66,8 @@ class Projectile : public GameObject {
                 active = false;
                 bDraw = false;
             }
+        }
+        bool isColliding (Entity* other) {
+            return body.getGlobalBounds ().intersects (other->getCollider ().getHitbox ().getGlobalBounds ());
         }
 };

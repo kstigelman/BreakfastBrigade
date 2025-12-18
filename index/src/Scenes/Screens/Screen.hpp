@@ -5,6 +5,7 @@ class Screen {
 private:
     std::string name;
     bool bFinished = false;
+    bool bFixed = false;
     std::set<sf::Keyboard::Key>* controller;
 
     std::string exitIdentifier = "null";
@@ -33,11 +34,16 @@ public:
     std::string getName () {
         return name;
     }
+    virtual void setPosition (sf::Vector2f position) {
 
+    };
     void setController (std::set<sf::Keyboard::Key>* newController) {
         controller = newController;
     }
     std::set<sf::Keyboard::Key>* getController () {
         return controller;
+    }
+    bool isFixed () {
+        return bFixed;
     }
 };

@@ -74,7 +74,8 @@ class Player : public Entity
 			Entity::setName ("Player");
 			//hud = PlayerHUD (&healthbar);
 			playerID = id;
-			
+			gun.setOwnerTag ("Player");
+
 			sprite.setScale (1.f, 1.f);
 			sprite.setOrigin (0, 0);
 			
@@ -110,8 +111,9 @@ class Player : public Entity
 			//gui = nullptr;
 			//delete gui;
 		}
-
-
+		PlayerHealthbar* getHealthbar () {
+			return &healthbar;
+		}
 		void update(float dt)
 		{
 			//hitbox.setPosition(sprite.getPosition());
@@ -148,15 +150,12 @@ class Player : public Entity
 		void draw(sf::RenderWindow& window)
 		{
 			//Entity::draw (window);
-			window.setView (camera);
 			window.draw (sprite);
 			
 			
 			collider.draw (window);
 			//window.draw(sprite);
 			//gui->Draw(window);
-			healthbar.draw (window);
-			window.setView (camera);
 			/*for(size_t i = 0; i < bullets.size(); i++)
 			{
 				bullets[i].draw(window);

@@ -9,6 +9,8 @@ class GameState {
         const unsigned MAX_ENTITY_LIMIT = 100;
         unsigned currentEntityLimit = 20;
         
+        
+
     public:
         GameState () {
         }

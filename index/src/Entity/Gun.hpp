@@ -14,6 +14,8 @@ class Gun {
 
         sf::Clock reloadClock;
         SpawnerFor<Projectile*>* projectileSpawner;
+
+        std::string ownerTag;
     public:
         Gun (Level* scene, float damage = 1.0, float bulletSpeed = 1.0) : scene(scene), damage(damage), bulletSpeed(bulletSpeed) {
             //scene->registerObject ();
@@ -26,9 +28,12 @@ class Gun {
                 return;
 
             reloadClock.restart();
-            scene->registerProjectile (new Projectile (scene, direction));
+            scene->registerProjectile (new Projectile (scene, direction, ownerTag));
         }
         bool canShoot () {
-            return reloadClock.getElapsedTime( ).asSeconds () >= reloadTime;
-        }       
+            return reloadClock.getElapsedTime().asSeconds () >= reloadTime;
+        }    
+        void setOwnerTag (std::string tag) {
+            ownerTag = tag;
+        }   
 };
