@@ -12,7 +12,8 @@
 #include "../Engine/GameFunctions.hpp"
 #include "../Entity/Spawner.hpp"
 #include "../Entity/Projectile.hpp"
-#include "Screens/Screen.hpp"
+//#include "Screens/Screen.hpp"
+#include "Screens/GameOverScreen.hpp"
 
 
 class ColiforB : public Level {
@@ -49,7 +50,7 @@ class ColiforB : public Level {
 
         std::vector<TextBox*> textboxes;
 
-        Screen* currentScreen = nullptr;
+       // Screen* currentScreen = nullptr;
         //SpawnerFor<Projectile*> projectiles;
         std::vector<std::tuple<Spawner*, int>> spawners;
     public:
@@ -112,29 +113,29 @@ class ColiforB : public Level {
                 if (tb != nullptr)
                     delete tb;
             textboxes.clear ();
+
+
             //entities.clear ();
         }
         Collider& getShip () {
             return ship.getCollider ();
         }
-        void replaceScreen (Screen* newScreen) {    
+        /*void replaceScreen (Screen* newScreen) {    
             Screen* oldScreen = currentScreen;
             currentScreen = newScreen;
             delete oldScreen;
             oldScreen = nullptr;
         }
+        void removeScreen () {
+            replaceScreen (nullptr);
+        }*/
 
         void update (float dt) override {
-            if (currentScreen) {
-                currentScreen->update (dt);
-                if (currentScreen->screenIsFinished ()) {
-                    if (currentScreen->getExitIdentifier() == "Quit") {
-                        setExitInfo ("QuitToTitle");
-                        setReadyForExitScene (true);
-                    }
-                }
-                return;
-            }
+            Scene::update (dt);
+
+            
+
+
             for (TextBox* tb : textboxes)
                 tb->update (dt);
 
@@ -255,7 +256,10 @@ class ColiforB : public Level {
             else {
                 if (!gameOver) {
                     gameOver = true;
-                    textboxes.push_back (new TextBox ("GAME OVER!", sf::Vector2f (0, 0), -1, 60, sf::Color::Red, true));
+                    //textboxes.push_back (new TextBox ("GAME OVER!", sf::Vector2f (0, 0), -1, 60, sf::Color::Red, true));
+                    //GameOverScreen (UIRegistry* registry, std::set<sf::Keyboard::Key>* controller) : Screen ("GameOver", controller),
+                    replaceScreen (new GameOverScreen (registry, getController ()));
+                   
                 }
                 else {
                     

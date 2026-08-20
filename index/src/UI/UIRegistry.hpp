@@ -53,6 +53,10 @@ class UIRegistry {
             }
             
         }
+        /**
+         * All UI elements will have an event handler.
+         * Events include mouse hover and mouse click.
+        **/
         void eventHandler (sf::Event& e) {
             for (size_t index = 0; index < elements.size(); ++index)
                 elements[index]->eventHandler (e);

@@ -25,10 +25,12 @@ private:
     GameSettings* gameSettings;
     bool bTick = false;
 
+    std::string inputMode = "MOUSE";
 
 
 protected:
     bool exitScene = false;
+    Screen* currentScreen;
     std::vector<std::function<void()>> deferredFunctions;
 public:
     Scene (GameSettings* gameSettings) : gameSettings(gameSettings), uiRegistry (gameSettings) {
@@ -42,19 +44,39 @@ public:
             o = nullptr;
         }
         objectCollection.clear ();
+
+        if (currentScreen) {
+            removeScreen ();
+        }
+        // Last update-- working on removing screens from inherited classes and working on inserting here
     }
+
     virtual void update (float dt) {
         // We should update a collision handler first
         // Then update all world objects
         // Manage entity list as necessary
 
-
+        if (currentScreen) {
+            currentScreen->update (dt);
+            if (currentScreen->screenIsFinished ()) {
+                if (currentScreen->getExitIdentifier() == "QuitToTitle") {
+                    setExitInfo ("QuitToTitle");
+                    setReadyForExitScene (true);
+                }
+                if (currentScreen->getExitIdentifier () == "Restart") {
+                    setExitInfo ("Play");
+                    setReadyForExitScene(true);
+                }
+            }
+            return;
+        }
 
         /*for (size_t i = 0; i < uiElements.size(); ++i) {
             uiElements[i]->update (dt);
         }*/
     }
     virtual void draw (sf::RenderWindow& window) {
+
         /*for (size_t i = 0; i < uiElements.size(); ++i) {
             uiElements[i]->draw (window);
         }*/
@@ -78,6 +100,19 @@ public:
     UIRegistry* getRegistry () {
         return &uiRegistry;
     }
+    Screen* getCurrentScreen () {
+        return currentScreen;
+    } 
+    void replaceScreen (Screen* newScreen) {    
+        Screen* oldScreen = currentScreen;
+        currentScreen = newScreen;
+        delete oldScreen;
+        oldScreen = nullptr;
+    }
+    void removeScreen () {
+        replaceScreen (nullptr);
+    }
+
     std::vector<GameObject*>& getGameObjects () {
         return objectCollection;
     }

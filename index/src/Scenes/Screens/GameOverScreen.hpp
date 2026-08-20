@@ -9,7 +9,7 @@
 class GameOverScreen : public Screen {
 private:
     Button quitButton;
-
+    Button retryButton;
     
     //std::vector<Button*> buttons;
     int selectedIndex = 0;
@@ -44,6 +44,7 @@ public:
         }
     }
     GameOverScreen (UIRegistry* registry, std::set<sf::Keyboard::Key>* controller) : Screen ("GameOver", controller),
+        retryButton(registry, "Retry", sf::Vector2f (192, 500), sf::Vector2f (100, 50)),
         quitButton(registry, "Quit", sf::Vector2f (308, 500), sf::Vector2f (100, 50))
     {
         uiRegistry = registry;
@@ -55,6 +56,11 @@ public:
         quitButton.setOnClicked ([this](){
             this->setScreenFinished (true);
             this->setExitIdentifier ("QuitToTitle");
+        });
+        retryButton.addTag ("RETRY");
+        retryButton.setOnClicked ([this] () {
+            this->setScreenFinished(true);
+            this->setExitIdentifier ("Restart");
         });
         //buttons.push_back (&quitButton);
         

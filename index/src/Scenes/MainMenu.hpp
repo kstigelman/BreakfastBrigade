@@ -31,7 +31,7 @@ private:
 
 
     // In the future, consider making a stack of screens
-    Screen* currentScreen;
+    //Screen* currentScreen;
 
     AnimatedObject ship = AnimatedObject ("resources/sprites/ship.png", 7, 7); 
     
@@ -116,13 +116,13 @@ public:
         ship.getSprite().setPosition (360, 360);
         ship.getSprite().setOrigin (15, 6);*/
     }
-    void replaceScreen (Screen* newScreen) {
+    /*void replaceScreen (Screen* newScreen) {
         
         Screen* oldScreen = currentScreen;
         currentScreen = newScreen;
         delete oldScreen;
         oldScreen = nullptr;
-    }
+    }*/
     void eventHandler (sf::Event& e) {
         getRegistry()->eventHandler (e);
     }

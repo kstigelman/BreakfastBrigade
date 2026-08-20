@@ -194,6 +194,12 @@ class Game
 			//uiRegistry.draw (window);
 			window.display();
 		}
+		/**
+		 * 
+		 *
+		 *
+		 *
+		**/
 		void update()
 		{
 			if (settings.currentScene == nullptr)
